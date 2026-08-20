@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <title>事件智研 · 事件智能全景工作台</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%230b2033'/%3E%3Cg fill='none' stroke='%235de2da' stroke-width='3'%3E%3Cpath d='M18 33 42 19M18 33l25 14'/%3E%3C/g%3E%3Cg fill='%235de2da'%3E%3Ccircle cx='17' cy='33' r='5'/%3E%3Ccircle cx='43' cy='18' r='5'/%3E%3Ccircle cx='44' cy='47' r='5'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="dashboard.css?v=20260820-v17">
+</head>
+<body>
+  <div class="noise"></div>
+  <aside class="side-rail">
+    <a class="identity" href="#taxonomy" aria-label="事件智能首页">
+      <span class="identity-mark"><i></i><i></i><i></i></span>
+      <span><b>EventScope</b><small>事件智能全景工作台</small></span>
+    </a>
+    <nav class="module-nav" id="module-nav">
+      <button class="active" data-view="taxonomy"><em>01</em><span><b>事件体系</b></span></button>
+      <button data-view="routing"><em>02</em><span><b>事件路由结果</b></span></button>
+      <button data-view="mentions"><em>03</em><span><b>事件实例</b></span></button>
+      <button data-view="quality"><em>04</em><span><b>事件过滤结果</b></span></button>
+      <button data-view="dedup"><em>05</em><span><b>去重与聚合</b></span></button>
+      <button data-view="library"><em>06</em><span><b>完整事件库</b></span></button>
+      <button data-view="media"><em>07</em><span><b>媒体可信度</b></span></button>
+      <button data-view="chains"><em>08</em><span><b>事件链展示</b></span></button>
+    </nav>
+    <div class="rail-status">
+      <div><span class="pulse"></span><b id="rail-validation">数据校验中</b></div>
+      <small id="rail-version">连接最新结果集…</small>
+    </div>
+  </aside>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="top-title"><span id="section-number">01</span><div><b id="section-title">事件体系</b><small id="section-subtitle" aria-hidden="true"></small></div><button class="section-guide" id="section-guide" type="button">说明</button></div>
+      <div class="top-actions"><span class="dataset-pill"><i></i><b>最新数据已校验</b></span><button id="refresh-view" title="刷新当前模块">↻</button></div>
+    </header>
+
+    <section class="workspace-view active" id="view-taxonomy" data-title="事件体系" data-subtitle="" data-number="01">
+      <div class="view-hero taxonomy-hero">
+        <div><h1>让每一条新闻，进入<br><em>稳定而可解释的事件坐标。</em></h1><p>展示冻结后的公司级与产业级事件体系，保留层级、定义、纳入条件和排除条件，为后续路由、提取与聚合提供统一语义底座。</p></div>
+        <div class="hero-stat"><span>事件卡总量</span><b><strong data-metric="event_cards">—</strong><em>张</em></b><small>冻结事件卡</small><i></i></div>
+      </div>
+      <div class="section-toolbar"><label><span>⌕</span><input data-search="taxonomy" placeholder="搜索事件名称、定义或事件卡编号"></label><select data-filter="taxonomy"><option value="all">全部范围</option><option value="company">公司级</option><option value="industry">产业级</option></select><button data-run="taxonomy">检索</button></div>
+      <div class="taxonomy-overview taxonomy-summary" id="taxonomy-overview"></div>
+      <div class="taxonomy-tree" id="taxonomy-results"><div class="loader">正在加载三级事件体系</div></div>
+    </section>
+
+    <section class="workspace-view" id="view-routing" data-title="事件路由结果" data-subtitle="" data-number="02">
+      <div class="view-heading"><div><h1>事件路由结果</h1><p>逐条查看新闻命中了哪些事件卡，或因何进入无事件、体系外及无效内容分支。</p></div><div class="heading-metrics"><span><b data-metric="route_rows">—</b> 路由记录</span><span><b data-metric="filtered_articles">—</b> 过滤记录</span></div></div>
+      <div class="section-toolbar"><label><span>⌕</span><input data-search="routing" placeholder="搜索新闻标题、媒体、事件卡或新闻编号"></label><select data-filter="routing"><option value="all">全部路由状态</option><option value="matched">已匹配事件</option><option value="trash">未形成事件</option></select><button data-run="routing">检索</button></div>
+      <div class="result-caption" id="routing-caption"></div><div class="result-grid" id="routing-results"></div><div class="pager" data-pager="routing"></div>
+    </section>
+
+    <section class="workspace-view" id="view-mentions" data-title="事件实例" data-subtitle="" data-number="03">
+      <div class="view-heading"><div><h1>事件实例提取</h1><p>从已路由新闻中提取主体、事实、时间、影响方向、断言状态与证据片段。</p></div><div class="heading-metrics"><span><b data-metric="mention_rows">—</b> 提取结果</span><span><b data-metric="valid_mentions">—</b> 有效实例</span></div></div>
+      <div class="section-toolbar"><label><span>⌕</span><input data-search="mentions" placeholder="搜索实体、事件事实、媒体或实例编号"></label><select data-filter="mentions"><option value="all">全部有效状态</option><option value="true">有效实例</option><option value="false">无效实例</option></select><button data-run="mentions">检索</button></div>
+      <div class="result-caption" id="mentions-caption"></div><div class="result-grid" id="mentions-results"></div><div class="pager" data-pager="mentions"></div>
+    </section>
+
+    <section class="workspace-view" id="view-quality" data-title="事件过滤结果" data-subtitle="" data-number="04">
+      <div class="view-heading"><div><h1>低质量内容过滤</h1><p>不只给出“被过滤”，还记录输入行、原媒体、正文摘要、规则代码与具体过滤理由。</p></div><div class="heading-metrics"><span><b data-metric="filtered_articles">—</b> 条审计记录</span></div></div>
+      <div class="reason-strip" id="quality-reasons"></div>
+      <div class="section-toolbar"><label><span>⌕</span><input data-search="quality" placeholder="搜索标题、媒体、新闻编号或过滤原因"></label><select data-filter="quality"><option value="filtered">明确过滤内容</option><option value="all">全部局部排除记录</option></select><button data-run="quality">检索</button></div>
+      <div class="result-caption" id="quality-caption"></div><div class="result-grid" id="quality-results"></div><div class="pager" data-pager="quality"></div>
+    </section>
+
+    <section class="workspace-view" id="view-dedup" data-title="事件去重与聚合结果" data-subtitle="" data-number="05">
+      <div class="view-heading"><div><h1>从重复报道到统一事件</h1><p>先还原同文传播顺序，再对同一事实的多个候选实例进行模型语义合并，形成最终统一事件。</p></div><div class="heading-metrics"><span><b data-metric="exact_repost_groups">—</b> 转载组</span><span><b data-metric="instances_reduced">—</b> 个实例被消歧合并</span></div></div>
+      <div class="mode-switch" id="dedup-switch"><button class="active" data-dedup-kind="reposts"><span>01</span><b>新闻去重与转载链</b><small>查看相同正文如何在不同媒体间传播</small></button><button data-dedup-kind="merges"><span>02</span><b>事件实例合并</b><small>查看多条新闻如何合并成统一事件</small></button></div>
+      <div class="section-toolbar"><label><span>⌕</span><input data-search="dedup" placeholder="搜索转载标题、媒体或已聚合事件"></label><button data-run="dedup">检索</button></div>
+      <div class="result-caption" id="dedup-caption"></div><div class="result-grid" id="dedup-results"></div><div class="pager" data-pager="dedup"></div>
+    </section>
+
+    <section class="workspace-view" id="view-library" data-title="完整事件库展示" data-subtitle="" data-number="06">
+      <div class="view-heading"><div><h1>完整事件库</h1><p>每个最终事件同时展示可信度、证据规模、后续确认数量，以及分数上升或受限的明确原因。</p></div><div class="heading-metrics"><span><b data-metric="event_instances">—</b> 最终事件</span><span><b data-metric="reporting_paths">—</b> 多源报道路径</span></div></div>
+      <div class="section-toolbar"><label><span>⌕</span><input data-search="library" placeholder="搜索事件事实、实体、领域或事件编号"></label><select data-filter="library"><option value="all">全部可信等级</option><option value="high">高可信</option><option value="medium">中可信</option><option value="low">低可信</option></select><button data-run="library">检索</button></div>
+      <div class="result-caption" id="library-caption"></div><div class="result-grid event-library" id="library-results"></div><div class="pager" data-pager="library"></div>
+    </section>
+
+    <section class="workspace-view" id="view-media" data-title="媒体可信度" data-subtitle="" data-number="07">
+      <div class="view-heading"><div><h1>媒体可信度反馈</h1><p>由事件最终可信度反向更新媒体评分；每次上升、下降和保持不变均留有原因与分数变动账本。</p></div><div class="heading-metrics"><span><b data-metric="media_profiles">—</b> 媒体档案</span><span><b data-metric="media_updates">—</b> 次反馈更新</span></div></div>
+      <div class="media-method"><div><span class="up">↗</span><b>报道获后续证实</b><small>提高对应媒体及领域表现分</small></div><div><span class="flat">—</span><b>事件尚待解决</b><small>保持待定，不提前奖惩</small></div><div><span class="down">↘</span><b>过滤或路由无结果</b><small>按原因和权重留下负向反馈</small></div></div>
+      <div class="section-toolbar"><label><span>⌕</span><input data-search="media" placeholder="搜索媒体名称"></label><select data-filter="media"><option value="all">全部可信等级</option><option value="high">高可信</option><option value="medium">中可信</option><option value="watch">观察</option><option value="insufficient_sample">样本不足</option></select><button data-run="media">检索</button></div>
+      <div class="result-caption" id="media-caption"></div><div class="result-grid media-grid" id="media-results"></div><div class="pager" data-pager="media"></div>
+    </section>
+
+    <section class="workspace-view" id="view-chains" data-title="事件链展示" data-subtitle="" data-number="08">
+      <div class="view-heading"><div><h1>事件脉络与动态预警</h1><p>持续连接重大进展、官方确认、市场反应、处置回应、风险升级与反转节点，并在必要时重新预警。</p></div><div class="heading-metrics"><span><b data-metric="event_chains">—</b> 条事件链</span><span><b data-metric="alerts">—</b> 条预警</span><span><b data-metric="dynamic_updates">—</b> 次动态更新</span></div></div>
+      <div class="annotation-strip" id="chain-annotations"></div>
+      <div class="section-toolbar"><label><span>⌕</span><input data-search="chains" placeholder="搜索公司、事件或节点内容"></label><select data-filter="chains"><option value="all">全部事件链</option><option value="confirmed">已确认</option><option value="developing">发展中</option><option value="reassessing">重新评估</option></select><button data-run="chains">检索</button></div>
+      <div class="result-caption" id="chains-caption"></div><div class="chain-list" id="chains-results"></div><div class="pager" data-pager="chains"></div>
+    </section>
+
+    <footer><span>事件智能全景工作台</span><span id="footer-time">等待数据连接</span></footer>
+  </main>
+
+  <dialog id="detail-dialog"><button class="dialog-close" aria-label="关闭">×</button><div id="detail-body"></div></dialog>
+  <dialog id="article-detail-dialog"><button class="dialog-close" aria-label="关闭新闻详情">×</button><div id="article-detail-body"></div></dialog>
+  <dialog id="guide-dialog"><button class="dialog-close" aria-label="关闭说明">×</button><div id="guide-body"></div></dialog>
+  <script src="static-api.js?v=20260820-frozen-v1"></script><script src="dashboard.js?v=20260820-v17"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>成果数据中心 · 事件智能</title>
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="style-extra.css"><link rel="stylesheet" href="intelligence.css">
+</head>
+<body class="intelligence-page">
+  <div class="glow glow-a"></div><div class="glow glow-b"></div>
+  <main>
+    <header class="compact-head">
+      <a href="index.html" class="brand">事件智能 <small>全景展示</small></a>
+      <nav class="page-nav"><a href="index.html">① 典型案例</a><a class="active" href="intelligence.html">② 成果数据中心</a><a href="events.html">③ 事件体系</a><a href="routes.html">④ 路由结果</a><a href="mentions.html">⑤ 提取结果</a></nav>
+    </header>
+    <section class="data-hero">
+      <div><p class="eyebrow">FULL RESULT EXPLORER</p><h1>成果数据中心</h1><p>典型案例之外的全部结果，都可以在这里按关键词、ID、媒体、实体、领域和状态检索。</p></div>
+      <div class="data-health"><span>VALIDATION</span><b id="validation">—</b><small id="health-note">正在连接数据</small></div>
+    </section>
+    <section class="dataset-tabs" id="dataset-tabs">
+      <button data-kind="instances" class="active"><i>50,200</i><b>聚合事件</b><span>多源事件实例</span></button>
+      <button data-kind="reposts"><i>7,873</i><b>同文传播</b><span>首个观察与后发链</span></button>
+      <button data-kind="reputation"><i>4,547</i><b>领域信誉</b><span>媒体专业表现</span></button>
+      <button data-kind="updates"><i>58,958</i><b>信誉账本</b><span>逐事件增量记录</span></button>
+      <button data-kind="claims"><i>450</i><b>主张状态</b><span>传闻、澄清与反驳</span></button>
+      <button data-kind="timelines"><i>3,289</i><b>实体脉络</b><span>跨事件时间索引</span></button>
+      <button data-kind="alerts"><i>504</i><b>动态预警</b><span>风险优先级排序</span></button>
+    </section>
+    <section class="intel-panel">
+      <div class="intel-toolbar">
+        <label class="search"><span>⌕</span><input id="intel-search" type="search" autocomplete="off" placeholder="搜索事件、实体、媒体或 ID"></label>
+        <select id="intel-state"></select><select id="intel-domain"></select>
+        <button id="intel-reset" class="quiet">重置</button><button id="intel-refresh" class="primary">刷新</button>
+      </div>
+      <div class="result-caption"><span id="result-caption">正在载入…</span><span id="query-hint">当前数据集：聚合事件</span></div>
+      <div id="intel-results" class="intel-results"></div>
+      <div class="pager"><button id="intel-prev" class="quiet">← 上一页</button><span id="intel-page">第 1 页</span><button id="intel-next" class="quiet">下一页 →</button></div>
+    </section>
+    <section class="raw-gateway"><div><p class="eyebrow">UPSTREAM TRACEABILITY</p><h2>继续追溯到上游</h2><p>成果记录保留事件 ID、新闻输入行 ID 和提取 ID，可继续回查原始事件卡、路由与结构化提取。</p></div><div><a href="events.html">事件体系</a><a href="routes.html">路由结果</a><a href="mentions.html">提取结果</a></div></section>
+  </main>
+  <dialog id="intel-detail"><button class="close" aria-label="关闭">×</button><div id="intel-detail-body"></div></dialog>
+  <script src="static-api.js?v=20260820-frozen-v1"></script><script src="intelligence.js?v=20260815-v1"></script>
+</body>
+</html>
