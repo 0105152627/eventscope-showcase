@@ -144,8 +144,21 @@
     };
   }
 
+  function normalizeEventCard(card) {
+    if (!card) return null;
+    const node = card.target_node || {};
+    return {
+      ...card,
+      event_name: card.event_name || node.event_name,
+      level: card.level ?? node.level,
+      definition: card.definition || node.definition,
+      inclusion_criteria: card.inclusion_criteria?.length ? card.inclusion_criteria : (node.inclusion_criteria || []),
+      exclusion_criteria: card.exclusion_criteria?.length ? card.exclusion_criteria : (node.exclusion_criteria || []),
+    };
+  }
+
   async function eventCard(identity) {
-    return lookup('events', identity);
+    return normalizeEventCard(await lookup('events', identity));
   }
 
   async function article(identity) {

@@ -368,28 +368,45 @@ function detailFrame(kicker, title, body, extraClass = '') {
 function criteriaList(items, emptyText) {
   return items?.length ? `<ul>${items.map(item => `<li>${esc(item)}</li>`).join('')}</ul>` : `<p class="detail-empty">${esc(emptyText)}</p>`;
 }
-function renderEventDefinition(record) {
-  const node = record.target_node || {};
-  const name = node.event_name || record.event_id;
-  const isRoot = Number(node.level) === 1;
-  const inclusion = node.inclusion_criteria?.length ? node.inclusion_criteria : isRoot ? [
+function resolvedEventCriteria(node, name) {
+  const isRoot = Number(node?.level) === 1;
+  const inclusion = node?.inclusion_criteria?.length ? node.inclusion_criteria : isRoot ? [
     `事件事实符合“${name}”的定义边界，并具备明确、可验证的依据。`,
     '可根据事件性质进一步归入本事件域下的二级或三级事件卡。'
   ] : [];
-  const exclusion = node.exclusion_criteria?.length ? node.exclusion_criteria : isRoot ? [
+  const exclusion = node?.exclusion_criteria?.length ? node.exclusion_criteria : isRoot ? [
     `仅与“${name}”存在词语关联、但不符合其实体定义边界的信息。`,
     '一般背景评论、日常信息或尚未形成明确事件事实的表述。'
   ] : [];
+  return {inclusion, exclusion};
+}
+function renderEventDefinition(record) {
+  const node = record.target_node || {};
+  const name = node.event_name || record.event_id;
+  const {inclusion, exclusion} = resolvedEventCriteria(node, name);
   return detailFrame('事件卡说明', name, `<div class="clean-id"><span>事件编号</span><code>${esc(record.event_id)}</code></div><section class="definition-panel"><span>事件定义</span><p>${esc(node.definition || '暂无定义')}</p></section><div class="criteria-grid"><section class="criteria include"><header><i>${icon('check')}</i><b>收录条件</b></header>${criteriaList(inclusion, '该层级不单独设置收录条件')}</section><section class="criteria exclude"><header><i>${icon('close')}</i><b>排斥条件</b></header>${criteriaList(exclusion, '该层级不单独设置排斥条件')}</section></div>`, 'event-definition-detail');
 }
 function routedBoundary(kind, label, items) {
-  const entries = (items || []).slice(0, 2);
+  const entries = items || [];
   return `<section class="routed-boundary ${kind}"><header><i>${icon(kind === 'include' ? 'check' : 'close')}</i><b>${label}</b>${items?.length ? `<small>${items.length} 条</small>` : ''}</header>${entries.length ? `<ul>${entries.map(item => `<li>${esc(item)}</li>`).join('')}</ul>` : '<p>该事件卡未单独设置</p>'}</section>`;
 }
 function renderRouteDetail(record) {
   const article = record.article || {};
   const cards = record.routed_event_cards || [];
-  const cardHtml = cards.length ? cards.map(card => `<article class="routed-card-detail"><div class="clean-id"><span>事件卡 ID</span><code>${esc(card.event_id)}</code></div>${card.parent_path?.length ? `<div class="parent-path">${card.parent_path.map(parent => `<span><small>L${parent.level}</small>${esc(parent.event_name)}</span>`).join('<i>→</i>')}<i>→</i><span class="current"><small>L${card.level}</small>${esc(card.event_name)}</span></div>` : ''}<h3>${esc(card.event_name)}</h3><p>${esc(card.definition || '暂无定义')}</p><div class="routed-boundaries">${routedBoundary('include', '收录条件', card.inclusion_criteria)}${routedBoundary('exclude', '排斥条件', card.exclusion_criteria)}</div></article>`).join('') : `<div class="route-empty-detail"><b>这条新闻没有进入任何事件卡</b><p>${esc(textLabel(record.trash_reason))}</p></div>`;
+  const cardHtml = cards.length ? cards.map(card => {
+    const node = card.target_node || {};
+    const name = card.event_name || node.event_name || card.event_id || '未命名事件卡';
+    const level = card.level ?? node.level;
+    const definition = card.definition || node.definition || '暂无定义';
+    const criteria = resolvedEventCriteria({
+      level,
+      inclusion_criteria: card.inclusion_criteria?.length ? card.inclusion_criteria : node.inclusion_criteria,
+      exclusion_criteria: card.exclusion_criteria?.length ? card.exclusion_criteria : node.exclusion_criteria,
+    }, name);
+    const parentPath = card.parent_path || [];
+    const pathHtml = parentPath.length ? `<div class="parent-path">${parentPath.map(parent => `<span><small>${parent.level == null ? '上级' : `L${parent.level}`}</small>${esc(parent.event_name)}</span>`).join('<i>→</i>')}<i>→</i><span class="current"><small>${level == null ? '事件卡' : `L${level}`}</small>${esc(name)}</span></div>` : '';
+    return `<article class="routed-card-detail"><div class="clean-id"><span>事件卡 ID</span><code>${esc(card.event_id)}</code></div>${pathHtml}<h3>${esc(name)}</h3><p>${esc(definition)}</p><div class="routed-boundaries">${routedBoundary('include', '收录条件', criteria.inclusion)}${routedBoundary('exclude', '排斥条件', criteria.exclusion)}</div></article>`;
+  }).join('') : `<div class="route-empty-detail"><b>这条新闻没有进入任何事件卡</b><p>${esc(textLabel(record.trash_reason))}</p></div>`;
   return detailFrame('新闻路由详情', article.article_title || record.input_row_id, `<div class="clean-id"><span>新闻编号</span><code>${esc(record.input_row_id)}</code></div><div class="detail-two-column"><section class="article-paper"><header><span>${icon('article')}</span><b>新闻正文</b></header><p>${esc(article.content || '正文为空')}</p></section><section class="routed-stack"><header class="section-label"><span>${icon('route')}</span><b>对应事件卡</b></header>${cardHtml}</section></div>`, 'route-detail');
 }
 function renderMentionDetail(record) {
