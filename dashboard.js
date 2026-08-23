@@ -19,20 +19,20 @@ const clip = (value, limit = 170) => {
   return text.length > limit ? `${text.slice(0, limit - 1)}…` : text;
 };
 const labels = {
-  company:'公司级', industry:'产业级', matched:'已匹配', trash:'未形成事件', true:'有效', false:'无效',
+  company:'公司级', industry:'产业级', matched:'匹配成功', trash:'未形成事件', true:'有效', false:'无效',
   high:'高可信', medium:'中可信', low:'低可信', watch:'观察', insufficient_sample:'样本不足',
   confirmed:'已确认', corroborated:'多源印证', reported:'已报道', unverified:'待核验',
   positive:'正面影响', negative:'负面影响', neutral:'影响中性', uncertain:'影响尚不明确',
   fact:'事实陈述', rumor:'传闻信息', denial:'否认或澄清',
   unique_earliest_observation:'唯一最早观测', tied_earliest_observations:'最早时间并列',
-  developing:'发展中', reassessing:'重新评估', resolved:'已解决',
+  developing:'持续发展', reassessing:'需要重新判断', resolved:'已有结果',
   INVALID_CONTENT:'无效内容', NO_SCHEMA_MATCH:'未被当前事件体系覆盖', NO_EVENT:'没有形成可提取事件', INSUFFICIENT_EVIDENCE:'证据不足',
   EVENT_CARD_MISMATCH:'事件卡不匹配',
   advertising_or_promotion_only:'广告或纯推广', content_shorter_than_repost_minimum:'正文过短',
-  invalid_content_by_route_review:'路由复核后判定无效', too_short_or_fragmentary_content:'正文残缺或只有来源署名',
+  invalid_content_by_route_review:'匹配复核后判定无效', too_short_or_fragmentary_content:'正文残缺或只有来源署名',
   empty_content:'正文为空', fetch_or_page_failure:'页面抓取失败',
   reported_supported_event:'报道的事件后来得到证实', route_no_event:'报道没有形成有效事件',
-  route_no_schema_match:'内容未被当前事件体系覆盖', routed_but_no_valid_event:'路由后未提取出有效事件',
+  route_no_schema_match:'内容未被当前事件体系覆盖', routed_but_no_valid_event:'匹配后未提取出有效事件',
   reported_low_confidence_event:'报道了低可信事件', route_invalid_content:'内容被判定为无效'
 };
 const textLabel = value => labels[String(value)] || String(value || '—');
@@ -53,14 +53,14 @@ let taxonomy = [];
 let mediaRecordParent = null;
 
 const sectionGuides = {
-  taxonomy: {number:'01', title:'事件体系说明', summary:'这是全流程的语义底座：每一条新闻都先在稳定、冻结的事件卡体系中找到可解释的位置。', process:['全量扫描新闻语料，逐条归纳其中可复用的通用事件。','将语义相近的通用事件持续合并、去重，并整理为公司级与产业级事件卡。','冻结事件名称、定义、纳入条件和排除条件，作为后续处理的统一标准。'], points:['按公司级、产业级和三级事件结构浏览事件卡。','每张事件卡明确给出定义、纳入条件与排除条件。','后续路由、实例提取和事件合并均以此体系为统一标准。']},
-  routing: {number:'02', title:'事件路由结果说明', summary:'展示每条新闻进入哪张事件卡，或为什么没有进入有效事件流程。', process:['新闻先匹配一级事件领域，缩小候选范围。','再依次匹配二级、三级事件卡，并核对新闻与事件定义是否一致。','匹配成功进入实例提取；无事件、体系外或无效内容进入对应审计分支。'], points:['“已匹配事件”表示新闻已命中对应事件卡，可进入实例提取。','“未形成事件”与体系外内容会保留具体原因，便于审计。','点击记录可查看新闻、路由判断与候选事件信息。']},
-  mentions: {number:'03', title:'事件实例说明', summary:'系统从已路由新闻中抽取可计算的事件事实，并保留结构化证据。', process:['对已路由新闻逐条提取主体、事件事实、时间、影响方向与断言状态。','将抽取结果与命中的事件卡进行匹配复核，排除不一致的组合。','通过复核的有效实例成为去重、聚合和可信度计算的输入。'], points:['抽取主体、事件事实、时间、影响方向和断言状态等字段。','有效实例会进入后续的去重、聚合与可信度评估。','详情可查看对应新闻的 ID、标题与正文。']},
-  quality: {number:'04', title:'事件过滤结果说明', summary:'低质量、无效或证据不足的内容不会静默丢弃，而是形成可回溯的审计记录。', process:['在路由与实例提取前后，检查正文完整性、内容有效性和证据充分性。','命中广告、碎片、抓取失败或事件不匹配等规则的内容被单独记录。','过滤记录保留原因和原文，避免低质量内容进入最终事件库。'], points:['展示过滤规则、原因代码、来源媒体与正文摘要。','过滤结果不会参与有效事件聚合，避免噪声污染结论。','可点击记录核对原始新闻与具体过滤依据。']},
-  dedup: {number:'05', title:'去重与聚合说明', summary:'先识别同文转载，再将指向同一事实的多个实例合并为统一事件。', process:['先利用正文特征识别完全同文，形成转载链并确定传播顺序。','再比较主体、事实、时间与语义相似度，合并指向同一现实事件的实例。','合并后汇总媒体、报道、证据组和后续确认，形成统一事件。'], points:['“新闻去重与转载链”还原同文在媒体间的传播路径。','“事件实例合并”基于语义和证据把重复事实归并。','展示端对同媒体同时间的重复记录只呈现一次。']},
-  library: {number:'06', title:'完整事件库说明', summary:'这里沉淀的是最终统一事件，并以证据规模和后续验证结果给出可信度与影响说明。', process:['由通过复核的事件实例经去重与语义合并后生成最终事件。','根据独立媒体数量、证据组、原始资料与后续确认计算事件可信度。','结合实例中的模型结构化影响原因，形成可解释的影响方向展示。'], points:['每条事件展示可信度、媒体/报道数量和后续确认次数。','影响方向及其原因来自事件实例中的模型结构化判断。','首页优先呈现可信、结论直观、适合演示的代表性案例。']},
-  media: {number:'07', title:'媒体可信度说明', summary:'媒体分数由其报道对应事件的后续验证结果反向更新，形成逐笔可查的信誉账本。', process:['媒体发布新闻后，系统将其关联到已提取并合并的事件。','等待事件后续证据、独立报道和可信度结果，再对媒体信誉给予反馈。','按媒体、时间、事件去重后，逐笔计算加减分并累计为当前档案分数。'], points:['后续获得证实的报道产生正向反馈；无有效事件或低可信事件会产生负向反馈。','同一媒体、同一时间、同一事件的重复反馈只计算一次。','点击每一笔变更可查看触发新闻、验证信息、加减分理由和分数前后变化。']},
-  chains: {number:'08', title:'事件链展示说明', summary:'系统把同一主题下的重大进展、确认、风险和回应按时间串联，呈现可追踪的演化过程。', process:['从最终事件中识别共享主体、时间相邻且存在合理关系的节点。','结合规则与模型判断确认、进展、市场反应、处置、升级或反转等关系。','按新闻的完整发布时间排序并折叠重复节点，生成可动态更新的事件链。'], points:['节点按对应新闻的完整发布时间（精确到秒）从早到晚排列。','展示层会折叠同一事件的重复节点，保留最早且可追溯的新闻。','点击节点可进入新闻详情；链路可触发动态更新和必要的风险预警。']},
+  taxonomy: {number:'01', title:'事件分类标准', summary:'先统一“什么算一类事件”，后面的每一步才有一致、可解释的判断依据。', process:['从新闻语料中归纳可复用的事件类型。','合并含义相近的类型，整理为公司级与产业级三级分类。','最终确定事件名称、定义、收录条件和排除条件，作为全流程标准。'], points:['按公司级、产业级和三级结构浏览事件分类卡。','每张卡明确说明“收什么”和“不收什么”。','点击任意分类卡可查看完整定义与判断边界。']},
+  routing: {number:'02', title:'新闻事件匹配', summary:'判断每条新闻属于哪一种事件类型，并说明匹配成功或未形成事件的原因。', process:['先匹配一级事件领域，缩小候选范围。','再依次匹配二级、三级事件类型，核对新闻事实是否符合定义。','匹配成功进入信息提取；未形成事件的内容保留具体原因。'], points:['“匹配成功”表示新闻已找到对应事件类型。','“未形成事件”会显示体系外、证据不足或内容无效等原因。','点击记录可同时核对原文、事件定义、收录条件和排除条件。']},
+  mentions: {number:'03', title:'关键信息提取', summary:'把长篇新闻转化为可计算、可核对的结构化事件事实。', process:['从匹配成功的新闻中提取主体、事件事实和发生时间。','判断影响方向与事实状态，并保留判断理由。','通过复核的结果进入去重、合并和可信度评估。'], points:['事件事实是对原文核心内容的简洁表达。','主体、事件类型、影响方向和事实状态以统一字段展示。','点击卡片可查看新闻编号、核心事实和评分依据。']},
+  quality: {number:'04', title:'无效新闻过滤', summary:'拦截广告、残缺文本和没有明确事实的内容，避免噪声进入最终结果。', process:['检查正文完整性、内容有效性和证据充分性。','命中过滤条件的内容单独记录，不再进入事件库。','保留新闻原文与具体原因，方便人工回溯。'], points:['卡片直接展示过滤原因、来源媒体和正文摘要。','过滤结果不会参与后续事件合并与可信度计算。','点击记录可核对完整原文和每一项过滤依据。']},
+  dedup: {number:'05', title:'重复报道合并', summary:'把重复新闻和重复事件合并，避免同一个事实被反复计算。', process:['识别正文完全相同的转载，形成传播顺序。','比较主体、事实、时间和语义，判断不同报道是否指向同一事件。','将相同事件合并，同时保留全部来源证据。'], points:['“同文转载”展示相同正文如何在媒体间传播。','“事件合并”展示不同写法如何归并为同一事实。','点击卡片可逐篇查看合并前新闻与最终事件。']},
+  library: {number:'06', title:'最终事件成果', summary:'这里展示项目最终形成的统一事件，以及每条结论背后的证据与评分依据。', process:['有效结果经过重复识别和语义合并，形成最终事件。','根据独立媒体、原始资料和后续确认计算可信度。','汇总事件事实、影响方向、来源证据和解释信息。'], points:['每张卡展示可信度、来源规模和后续确认次数。','点击后可从最终结论追溯到每篇原始新闻。','可信度和影响方向均给出清晰的判断依据。']},
+  media: {number:'07', title:'媒体可信分析', summary:'用事件后来是否被证实，反向检验最初发布该报道的媒体。', process:['新闻先关联到对应的最终事件。','等待更多独立报道和后续事实出现。','根据事件最终结果更新媒体表现，并逐笔保存变化原因。'], points:['获得后续证实的报道产生正向反馈。','未形成有效事件或可信度较低的报道产生相应反馈。','点击每笔变化可查看触发新闻、后续证据和分数前后变化。']},
+  chains: {number:'08', title:'事件发展脉络', summary:'把同一主题下真正相关的事件按时间连接，呈现从起因到结果的发展过程。', process:['从最终事件中选择主体一致、主题一致且关系明确的节点。','按起因、推进、市场反应、处置和结果整理逻辑。','依据完整发布时间排序，形成可追溯的事件发展脉络。'], points:['前三页优先展示 24 条关系明确、逻辑连贯的重点事件链。','每条链归属一个最适合的一级事件类型。','点击节点可查看对应原始新闻，核对时间与事实。']},
 };
 
 async function getJson(url) {
@@ -91,7 +91,7 @@ function empty(message = '没有找到符合条件的记录', error = false) {
 }
 function setCaption(view, data, label) {
   const element = $(`#${view}-caption`);
-  if (element) element.textContent = `${label}${data.showcase_priority ? ' · 典型匹配样本优先' : ''} · 本页 ${data.items.length} 条 · 第 ${data.page} 页 · ${data.updated_at || '实时数据'}`;
+  if (element) element.textContent = `${label}${data.showcase_priority ? ' · 优先展示代表性结果' : ''} · 本页 ${data.items.length} 条 · 第 ${data.page} 页`;
 }
 function renderPager(view) {
   const container = $(`[data-pager="${view}"]`);
@@ -145,7 +145,7 @@ function eventCard(item, kind = 'instances') {
     <h3>${esc(clip(item.canonical_fact, 210))}</h3>
     <div class="meta-line"><span>${esc(item.anchor_entity?.name || '主体待定')}</span><span>${esc(item.primary_event_name || item.root_domain)}</span><span>${esc(item.event_date || item.first_seen_at || '日期待定')}</span></div>
     ${scoreBar(item.credibility_score)}
-    <div class="reason-box"><b>为什么这样判断：</b>${esc(reasons.find(reason => !String(reason).startsWith('基础证据分')) || '综合来源数量、证据类型和后续确认情况评估')}</div>
+    <div class="reason-box"><b>可信度依据：</b>${esc(reasons.find(reason => !String(reason).startsWith('基础证据分')) || '综合来源数量、证据类型和后续确认情况评估')}</div>
     <div class="meta-line"><span>${fmt(item.publisher_count)} 家媒体</span><span>${fmt(item.article_count)} 篇报道</span><span>${fmt(item.followup_confirmation_count)} 次后续确认</span></div>
   </article>`;
 }
@@ -169,9 +169,6 @@ async function loadSummary() {
   summary = await getJson('/api/showcase');
   const metrics = summary.headline_metrics || {};
   $$('[data-metric]').forEach(element => element.textContent = fmt(metrics[element.dataset.metric]));
-  $('#rail-validation').textContent = summary.validation_status === 'pass' ? '全部数据校验通过' : '数据需要检查';
-  $('#rail-version').textContent = summary.validated_at ? `校验完成：${summary.validated_at}` : '已连接最新结果集';
-  $('#footer-time').textContent = `数据校验时间：${summary.validated_at || '—'}`;
   const qualityReasons = summary.quality_reason_counts || {};
   $('#quality-reasons').innerHTML = Object.entries(qualityReasons).filter(([key]) => key !== 'content_shorter_than_repost_minimum').map(([key, value]) => `<span>${esc(textLabel(key))}<b>${fmt(value)}</b></span>`).join('');
   const annotations = summary.chain_annotations || {};
@@ -252,10 +249,10 @@ async function loadRouting() {
     if (requestId !== state.requestId) return;
     state.more = data.has_more;
     state.totalPages = data.total_pages || null;
-    setCaption('routing', data, '新闻路由');
+    setCaption('routing', data, '新闻事件匹配');
     $('#routing-results').innerHTML = data.items.map(item => `<article class="data-card routing-card" data-detail-kind="routes" data-api="upstream" data-id="${esc(item.input_row_id)}">
       <div class="card-top"><code>${esc(item.input_row_id)}</code>${chip(item.route_status)}</div><h3>${esc(clip(item.article_title, 170))}</h3><p>${esc(clip(item.content_preview, 180))}</p>
-      ${item.final_event_ids?.length ? `<div class="route-events">${item.routed_events.slice(0, 3).map(event => `<span>${esc(event.event_name)}</span>`).join('')}</div>` : `<div class="reason-box"><b>没有进入事件卡：</b>${esc(textLabel(item.trash_reason))}</div>`}
+      ${item.final_event_ids?.length ? `<div class="route-events">${item.routed_events.slice(0, 3).map(event => `<span>${esc(event.event_name)}</span>`).join('')}</div>` : `<div class="reason-box"><b>未形成事件的原因：</b>${esc(textLabel(item.trash_reason))}</div>`}
       <div class="meta-line"><span>${esc(item.article_source)}</span><span>${esc(item.article_publish_time)}</span></div></article>`).join('') || empty();
     renderPager('routing'); bindDetailCards();
   } catch (error) { $('#routing-results').innerHTML = empty(error.message, true); }
@@ -267,7 +264,7 @@ async function loadMentions() {
     const data = await upstreamQuery('mentions', {page:state.page, q:$('[data-search="mentions"]').value.trim(), state:$('[data-filter="mentions"]').value});
     state.more = data.has_more;
     state.totalPages = data.total_pages || null;
-    setCaption('mentions', data, '结构化事件实例');
+    setCaption('mentions', data, '关键信息提取结果');
     $('#mentions-results').innerHTML = data.items.map(item => {
       const extraction = item.extraction || {};
       if (item.pair_valid !== true) return `<article class="data-card mention-card invalid-mention-card" data-detail-kind="mentions" data-api="upstream" data-id="${esc(item.mention_id)}"><div class="card-top"><code>${esc(item.mention_id)}</code>${chip(String(item.pair_valid))}</div><div class="reason-box"><b>无效原因：</b>${esc(textLabel(item.invalid_reason || '未说明'))}</div></article>`;
@@ -283,7 +280,7 @@ async function loadQuality() {
     const data = await intelligenceQuery('quality', {page:state.page, q:$('[data-search="quality"]').value.trim(), state:$('[data-filter="quality"]').value});
     state.more = data.has_more;
     state.totalPages = data.total_pages || null;
-    setCaption('quality', data, '过滤审计');
+    setCaption('quality', data, '无效新闻过滤结果');
     $('#quality-results').innerHTML = data.items.map(item => `<article class="data-card quality-card" data-detail-kind="quality" data-id="${esc(item.input_row_id)}"><div class="card-top"><code>${esc(item.input_row_id)}</code>${chip('已过滤','bad')}</div><h3>${esc(item.title || '无标题内容')}</h3><p>${esc(clip(item.content_excerpt, 190) || '正文为空')}</p><div class="route-events">${(item.filter_reason_codes || []).map(reason => `<span>${esc(textLabel(reason))}</span>`).join('')}</div><div class="meta-line"><span>${esc(item.publisher)}</span><span>正文 ${fmt(item.normalized_content_length)} 字</span><span>点击查看过滤原因</span></div></article>`).join('') || empty();
     renderPager('quality'); bindDetailCards();
   } catch (error) { $('#quality-results').innerHTML = empty(error.message, true); }
@@ -295,7 +292,7 @@ async function loadDedup() {
     const data = await intelligenceQuery(state.kind, {page:state.page, q:$('[data-search="dedup"]').value.trim()});
     state.more = data.has_more;
     state.totalPages = data.total_pages || null;
-    setCaption('dedup', data, state.kind === 'reposts' ? '新闻去重与转载链' : 'LLM事件实例合并');
+    setCaption('dedup', data, state.kind === 'reposts' ? '同文转载识别' : '重复事件合并');
     $('#dedup-results').innerHTML = data.items.map(item => state.kind === 'reposts' ? repostCard(item) : eventCard(item, 'merges')).join('') || empty();
     renderPager('dedup'); bindDetailCards();
   } catch (error) { $('#dedup-results').innerHTML = empty(error.message, true); }
@@ -307,7 +304,7 @@ async function loadLibrary() {
     const data = await intelligenceQuery('instances', {page:state.page, q:$('[data-search="library"]').value.trim(), state:$('[data-filter="library"]').value});
     state.more = data.has_more;
     state.totalPages = data.total_pages || null;
-    setCaption('library', data, '最终统一事件');
+    setCaption('library', data, '最终事件成果');
     $('#library-results').innerHTML = data.items.map(item => eventCard(item, 'instances')).join('') || empty();
     renderPager('library'); bindDetailCards();
   } catch (error) { $('#library-results').innerHTML = empty(error.message, true); }
@@ -319,7 +316,7 @@ async function loadMedia() {
     const data = await intelligenceQuery('media', {page:state.page, q:$('[data-search="media"]').value.trim(), state:$('[data-filter="media"]').value, order:'score'});
     state.more = data.has_more;
     state.totalPages = data.total_pages || null;
-    setCaption('media', data, '媒体可信度档案');
+    setCaption('media', data, '媒体可信分析结果');
     $('#media-results').innerHTML = data.items.map(item => {
       const resolved = Number(item.increases || 0) + Number(item.decreases || 0);
       return `<article class="data-card media-card" data-detail-kind="media" data-id="${esc(item.publisher_family)}"><div class="media-head"><div><div class="card-top"><code>${fmt(resolved)} 条升降记录</code>${chip(item.credibility_level)}</div><h3>${esc(item.publisher_family)}</h3></div><div class="media-score">${Number(item.credibility_score || 0).toFixed(1)}</div></div><div class="feedback-grid two"><span><b>${fmt(item.increases)}</b>上升记录</span><span><b>${fmt(item.decreases)}</b>下降记录</span></div></article>`;
@@ -334,7 +331,7 @@ async function loadChains() {
     const data = await intelligenceQuery('chains', {page:state.page, size:8, q:$('[data-search="chains"]').value.trim(), state:$('[data-filter="chains"]').value});
     state.more = data.has_more;
     state.totalPages = data.total_pages;
-    setCaption('chains', data, '全量事件链');
+    setCaption('chains', data, state.page <= 3 ? '重点事件发展脉络' : '事件发展脉络');
     $('#chains-results').innerHTML = data.items.map(chainCard).join('') || empty();
     renderPager('chains'); bindDetailCards();
   } catch (error) { $('#chains-results').innerHTML = empty(error.message, true); }
@@ -384,7 +381,7 @@ function renderEventDefinition(record) {
   const node = record.target_node || {};
   const name = node.event_name || record.event_id;
   const {inclusion, exclusion} = resolvedEventCriteria(node, name);
-  return detailFrame('事件卡说明', name, `<div class="clean-id"><span>事件编号</span><code>${esc(record.event_id)}</code></div><section class="definition-panel"><span>事件定义</span><p>${esc(node.definition || '暂无定义')}</p></section><div class="criteria-grid"><section class="criteria include"><header><i>${icon('check')}</i><b>收录条件</b></header>${criteriaList(inclusion, '该层级不单独设置收录条件')}</section><section class="criteria exclude"><header><i>${icon('close')}</i><b>排斥条件</b></header>${criteriaList(exclusion, '该层级不单独设置排斥条件')}</section></div>`, 'event-definition-detail');
+  return detailFrame('事件分类卡', name, `<div class="clean-id"><span>分类卡编号</span><code>${esc(record.event_id)}</code></div><section class="definition-panel"><span>事件定义</span><p>${esc(node.definition || '暂无定义')}</p></section><div class="criteria-grid"><section class="criteria include"><header><i>${icon('check')}</i><b>收录条件</b></header>${criteriaList(inclusion, '该层级不单独设置收录条件')}</section><section class="criteria exclude"><header><i>${icon('close')}</i><b>排除条件</b></header>${criteriaList(exclusion, '该层级不单独设置排除条件')}</section></div>`, 'event-definition-detail');
 }
 function routedBoundary(kind, label, items) {
   const entries = items || [];
@@ -405,9 +402,9 @@ function renderRouteDetail(record) {
     }, name);
     const parentPath = card.parent_path || [];
     const pathHtml = parentPath.length ? `<div class="parent-path">${parentPath.map(parent => `<span><small>${parent.level == null ? '上级' : `L${parent.level}`}</small>${esc(parent.event_name)}</span>`).join('<i>→</i>')}<i>→</i><span class="current"><small>${level == null ? '事件卡' : `L${level}`}</small>${esc(name)}</span></div>` : '';
-    return `<article class="routed-card-detail"><div class="clean-id"><span>事件卡 ID</span><code>${esc(card.event_id)}</code></div>${pathHtml}<h3>${esc(name)}</h3><p>${esc(definition)}</p><div class="routed-boundaries">${routedBoundary('include', '收录条件', criteria.inclusion)}${routedBoundary('exclude', '排斥条件', criteria.exclusion)}</div></article>`;
-  }).join('') : `<div class="route-empty-detail"><b>这条新闻没有进入任何事件卡</b><p>${esc(textLabel(record.trash_reason))}</p></div>`;
-  return detailFrame('新闻路由详情', article.article_title || record.input_row_id, `<div class="clean-id"><span>新闻编号</span><code>${esc(record.input_row_id)}</code></div><div class="detail-two-column"><section class="article-paper"><header><span>${icon('article')}</span><b>新闻正文</b></header><p>${esc(article.content || '正文为空')}</p></section><section class="routed-stack"><header class="section-label"><span>${icon('route')}</span><b>对应事件卡</b></header>${cardHtml}</section></div>`, 'route-detail');
+    return `<article class="routed-card-detail"><div class="clean-id"><span>分类卡编号</span><code>${esc(card.event_id)}</code></div>${pathHtml}<h3>${esc(name)}</h3><p>${esc(definition)}</p><div class="routed-boundaries">${routedBoundary('include', '收录条件', criteria.inclusion)}${routedBoundary('exclude', '排除条件', criteria.exclusion)}</div></article>`;
+  }).join('') : `<div class="route-empty-detail"><b>这条新闻没有匹配到明确事件类型</b><p>${esc(textLabel(record.trash_reason))}</p></div>`;
+  return detailFrame('新闻事件匹配详情', article.article_title || record.input_row_id, `<div class="clean-id"><span>新闻编号</span><code>${esc(record.input_row_id)}</code></div><div class="detail-two-column"><section class="article-paper"><header><span>${icon('article')}</span><b>新闻原文</b></header><p>${esc(article.content || '正文为空')}</p></section><section class="routed-stack"><header class="section-label"><span>${icon('route')}</span><b>匹配到的事件类型</b></header>${cardHtml}</section></div>`, 'route-detail');
 }
 function renderMentionDetail(record) {
   const article = record.article || {};
@@ -418,7 +415,7 @@ function renderMentionDetail(record) {
   };
   const final = record.final_event_instance || {};
   const score = final.credibility_score;
-  return detailFrame('事件实例详情', article.article_title || record.input_row_id, `<div class="clean-id"><span>新闻编号</span><code>${esc(record.input_row_id)}</code></div><div class="mention-detail-grid"><section class="fact-spotlight"><span>提取到的事件正文</span><p>${esc(extraction.event_fact || '未提取到有效事件正文')}</p></section><section class="compact-score"><span>事件可信度</span><b>${score == null ? '待聚合' : `${Math.round(score * 100)}分`}</b><small>${esc(textLabel(final.credibility_level || ''))}</small></section><section class="impact-panel"><span>影响方向</span><b>${esc(textLabel(extraction.impact_direction))}</b><p>${esc(extraction.impact_reason || '未提供影响判断理由')}</p></section></div>${final.credibility_explanation?.length ? `<section class="plain-explanation"><header>${icon('score')} 为什么得到这个可信度</header>${final.credibility_explanation.map(line => `<p>${esc(line)}</p>`).join('')}</section>` : ''}`, 'mention-detail');
+  return detailFrame('关键信息提取详情', article.article_title || record.input_row_id, `<div class="clean-id"><span>新闻编号</span><code>${esc(record.input_row_id)}</code></div><div class="mention-detail-grid"><section class="fact-spotlight"><span>核心事件事实</span><p>${esc(extraction.event_fact || '未提取到有效事件事实')}</p></section><section class="compact-score"><span>事件可信度评分</span><b>${score == null ? '待合并' : `${Math.round(score * 100)}分`}</b><small>${esc(textLabel(final.credibility_level || ''))}</small></section><section class="impact-panel"><span>影响方向与判断依据</span><b>${esc(textLabel(extraction.impact_direction))}</b><p>${esc(extraction.impact_reason || '未提供影响判断理由')}</p></section></div>${final.credibility_explanation?.length ? `<section class="plain-explanation"><header>${icon('score')} 可信度评分依据</header>${final.credibility_explanation.map(line => `<p>${esc(line)}</p>`).join('')}</section>` : ''}`, 'mention-detail');
 }
 function renderQualityDetail(record) {
   const article = record.article || {};
@@ -435,7 +432,7 @@ function sourceBrowser(members, readerId) {
 }
 function renderMergeDetail(record) {
   const members = record.members || [];
-  return detailFrame('LLM EVENT INSTANCE MERGE', '多条新闻合并为一个统一事件', `<div class="merge-workbench"><section class="merge-sources"><header class="section-label"><span>${icon('article')}</span><b>合并前的新闻（${fmt(members.length)}条）</b></header>${sourceBrowser(members, 'merge-article-reader')}</section><div class="merge-arrow"><i>${icon('arrow')}</i><span>语义归并</span></div><section class="merged-result"><header><span>${icon('merge')}</span><b>合并后的事件</b></header><div class="clean-id"><span>事件 ID</span><code>${esc(record.event_instance_id)}</code></div><p>${esc(record.canonical_fact)}</p>${record.llm_merge_reason ? `<div class="llm-human-note"><b>合并理由</b>${esc(record.llm_merge_reason)}</div>` : ''}</section></div>`, 'merge-detail');
+  return detailFrame('重复事件合并详情', '多条新闻合并为一个统一事件', `<div class="merge-workbench"><section class="merge-sources"><header class="section-label"><span>${icon('article')}</span><b>合并前的新闻（${fmt(members.length)}条）</b></header>${sourceBrowser(members, 'merge-article-reader')}</section><div class="merge-arrow"><i>${icon('arrow')}</i><span>语义合并</span></div><section class="merged-result"><header><span>${icon('merge')}</span><b>合并后的事件</b></header><div class="clean-id"><span>事件编号</span><code>${esc(record.event_instance_id)}</code></div><p>${esc(record.canonical_fact)}</p>${record.llm_merge_reason ? `<div class="llm-human-note"><b>为什么可以合并</b>${esc(record.llm_merge_reason)}</div>` : ''}</section></div>`, 'merge-detail');
 }
 function impactText(record) {
   const directions = record.impact_directions || [];
@@ -444,15 +441,15 @@ function impactText(record) {
 function impactEvidence(record) {
   const reasons = record.impact_explanations || [];
   const direction = impactText(record);
-  const title = direction && direction !== '未判断' ? `LLM 为什么判断为${direction}` : 'LLM 影响判断理由';
-  if (!reasons.length) return `<section class="impact-evidence empty-evidence"><header><span>${icon('arrow')}</span><div><b>${title}</b><small>事件提取阶段生成</small></div></header><p>当前事件尚未生成可展示的影响理由。</p></section>`;
+  const title = direction && direction !== '未判断' ? `${direction}的判断依据` : '影响方向判断依据';
+  if (!reasons.length) return `<section class="impact-evidence empty-evidence"><header><span>${icon('arrow')}</span><div><b>${title}</b><small>基于新闻事实分析</small></div></header><p>当前事件尚未生成可展示的影响理由。</p></section>`;
   const representative = reasons[0];
-  return `<section class="impact-evidence"><header><span>${icon('arrow')}</span><div><b>${title}</b><small>事件提取阶段由 LLM 生成</small></div></header><article><p>${esc(representative.reason)}</p></article></section>`;
+  return `<section class="impact-evidence"><header><span>${icon('arrow')}</span><div><b>${title}</b><small>基于新闻事实分析</small></div></header><article><p>${esc(representative.reason)}</p></article></section>`;
 }
 function renderInstanceDetail(record) {
   const members = record.members || [];
   const explanation = record.credibility_explanation || [];
-  return detailFrame('事件库详情', record.canonical_fact || record.event_instance_id, `<div class="library-detail-grid"><section class="library-sources"><header class="section-label"><span>${icon('article')}</span><b>原始新闻（${fmt(members.length)}条）</b><small>点击左侧新闻查看全文</small></header>${sourceBrowser(members, 'library-article-reader')}</section><section class="event-verdict"><div class="clean-id"><span>事件编号</span><code>${esc(record.event_instance_id)}</code></div><div class="verdict-fact"><span>统一事件正文</span><p>${esc(record.canonical_fact)}</p></div><div class="verdict-metrics"><div><span>事件可信度</span><b>${Math.round(Number(record.credibility_score || 0) * 100)}分</b></div><div><span>影响方向</span><b>${esc(impactText(record))}</b></div></div>${impactEvidence(record)}<section class="plain-explanation"><header>${icon('score')} 可信度为什么是这个分数</header>${explanation.map(line => `<p>${esc(line)}</p>`).join('')}</section></section></div>`, 'library-detail');
+  return detailFrame('最终事件详情', record.canonical_fact || record.event_instance_id, `<div class="library-detail-grid"><section class="library-sources"><header class="section-label"><span>${icon('article')}</span><b>原始新闻证据（${fmt(members.length)}条）</b><small>点击左侧新闻查看全文</small></header>${sourceBrowser(members, 'library-article-reader')}</section><section class="event-verdict"><div class="clean-id"><span>事件编号</span><code>${esc(record.event_instance_id)}</code></div><div class="verdict-fact"><span>最终事件事实</span><p>${esc(record.canonical_fact)}</p></div><div class="verdict-metrics"><div><span>事件可信度评分</span><b>${Math.round(Number(record.credibility_score || 0) * 100)}分</b></div><div><span>影响方向</span><b>${esc(impactText(record))}</b></div></div>${impactEvidence(record)}<section class="plain-explanation"><header>${icon('score')} 可信度评分依据</header>${explanation.map(line => `<p>${esc(line)}</p>`).join('')}</section></section></div>`, 'library-detail');
 }
 function renderMediaDetail(record) {
   const history = record.history || [];
@@ -465,7 +462,7 @@ function recordArticlePanel(article) {
 function routeMatchContext(article) {
   const cards = article?.routed_event_cards || [];
   if (!cards.length) return '';
-  return `<section class="route-match-context"><header><span>${icon('route')}</span><div><b>路由命中的事件卡</b><small>新闻已路由成功，但后续匹配复核未形成有效事件实例</small></div></header><div class="route-match-cards">${cards.map(card => `<article><code>${esc(card.event_id)}</code><b>${esc(card.event_name || '事件卡')}</b><small>${esc(card.source_path || '')}</small></article>`).join('')}</div></section>`;
+  return `<section class="route-match-context"><header><span>${icon('route')}</span><div><b>初步匹配到的事件类型</b><small>新闻已找到候选类型，但后续复核未形成有效事件</small></div></header><div class="route-match-cards">${cards.map(card => `<article><code>${esc(card.event_id)}</code><b>${esc(card.event_name || '事件类型')}</b><small>${esc(card.source_path || '')}</small></article>`).join('')}</div></section>`;
 }
 function verificationMembers(update, instance) {
   const members = instance?.members || [];
@@ -539,12 +536,14 @@ function bindChainNewsDetails(container) {
 }
 
 async function bindArticleReaders(container, openFirst = true) {
-  container.querySelectorAll('[data-article-id]').forEach(button => button.onclick = async () => {
+  container.querySelectorAll('[data-article-id]').forEach(button => button.onclick = async event => {
     const reader = $(`#${button.dataset.articleReader}`);
     container.querySelectorAll(`[data-article-reader="${button.dataset.articleReader}"]`).forEach(item => item.classList.toggle('active', item === button));
     reader.classList.remove('is-empty');
     reader.innerHTML = '<div class="loader">正在读取新闻正文</div>';
-    reader.scrollIntoView({behavior:'smooth', block:'start'});
+    // Auto-opening the first source should not jump past the event title.
+    // Only a deliberate user click moves the reader into view.
+    if (event?.isTrusted) reader.scrollIntoView({behavior:'smooth', block:'start'});
     try {
       const article = await getJson(`/api/article?id=${encodeURIComponent(button.dataset.articleId)}`);
       reader.innerHTML = `<header><span>${icon('article')}</span><div><b>${esc(article.title || '无标题')}</b><small>${esc(article.news_id)} · ${esc(article.publisher || '')} · ${esc(article.publish_time || '')}</small></div></header><p>${esc(article.content || '正文为空')}</p>`;
@@ -570,6 +569,7 @@ async function openDetail(kind, identity, apiType = 'intelligence') {
     if (kind === 'media') bindMediaRecordDetails(body, record.publisher_family);
     else if (['reposts','merges','instances'].includes(kind)) bindArticleReaders(body);
     else if (kind === 'chains') bindChainNewsDetails(body);
+    dialog.scrollTop = 0;
   } catch (error) { body.innerHTML = `<div class="detail-content">${empty(error.message, true)}</div>`; }
 }
 
@@ -599,10 +599,6 @@ $('#dedup-switch').onclick = event => {
   $('[data-search="dedup"]').value = '';
   loadView('dedup', true);
 };
-$('#refresh-view').onclick = () => {
-  if (pageState[activeView]) pageState[activeView].loaded = false;
-  loadView(activeView, true);
-};
 $('#section-guide').onclick = openSectionGuide;
 $('.dialog-close').onclick = () => {
   if (mediaRecordParent) {
@@ -621,6 +617,6 @@ $('#guide-dialog').onclick = event => { if (event.target === $('#guide-dialog'))
 
 (async () => {
   try { await loadSummary(); }
-  catch (error) { $('#rail-validation').textContent = '数据连接失败'; $('#rail-version').textContent = error.message; }
+  catch (error) { console.error('展示数据读取失败：', error); }
   activate(location.hash.slice(1) || 'taxonomy');
 })();
