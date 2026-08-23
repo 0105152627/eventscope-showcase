@@ -3,7 +3,7 @@
   'use strict';
   const nativeFetch = window.fetch.bind(window);
   const base = new URL('./', document.currentScript.src);
-  const dataVersion = '20260823-curated-chains-v2';
+  const dataVersion = '20260824-chain-primary-events-v3';
   const jsonCache = new Map();
   const bucketCache = new Map();
   const scanCache = new Map();
