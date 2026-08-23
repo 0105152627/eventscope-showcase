@@ -3,15 +3,22 @@
   'use strict';
   const nativeFetch = window.fetch.bind(window);
   const base = new URL('./', document.currentScript.src);
+  const dataVersion = '20260823-curated-chains-v1';
   const jsonCache = new Map();
   const bucketCache = new Map();
   const scanCache = new Map();
   let manifestPromise;
 
+  function assetUrl(relative) {
+    const url = new URL(relative, base);
+    url.searchParams.set('v', dataVersion);
+    return url;
+  }
+
   async function gzipJson(relative) {
     if (jsonCache.has(relative)) return jsonCache.get(relative);
     const promise = (async () => {
-      const response = await nativeFetch(new URL(relative, base));
+      const response = await nativeFetch(assetUrl(relative));
       if (!response.ok) throw new Error(`静态数据读取失败：${relative}`);
       if (!('DecompressionStream' in window)) throw new Error('浏览器版本过旧，不支持冻结数据解压');
       const stream = response.body.pipeThrough(new DecompressionStream('gzip'));
@@ -23,7 +30,7 @@
   }
 
   function manifest() {
-    return manifestPromise ||= nativeFetch(new URL('static-data/manifest.json', base)).then(response => {
+    return manifestPromise ||= nativeFetch(assetUrl('static-data/manifest.json')).then(response => {
       if (!response.ok) throw new Error('冻结数据清单读取失败');
       return response.json();
     });
