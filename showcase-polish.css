@@ -208,11 +208,13 @@ button, input, select { letter-spacing: 0; }
 .section-toolbar select { min-width: 186px; background: #0b2a3f; color: #c4d6df; font-size: 13px; }
 .section-toolbar button { min-width: 82px; font-size: 13px; }
 .result-caption {
-  height: 30px;
-  padding: 3px 4px;
-  color: #7996a7;
+  height: 40px;
+  padding: 7px 4px;
+  color: #a8c2d0;
   font-family: inherit;
-  font-size: 11px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
   letter-spacing: 0;
 }
 
@@ -250,6 +252,21 @@ button, input, select { letter-spacing: 0; }
 .taxonomy-summary .scope-stat small { color: #7e9aaa; font-size: 11px; }
 .node-copy b { font-size: 15px; }
 .node-copy small { font-family: inherit; letter-spacing: 0; }
+.taxonomy-heading > div:first-child { max-width: 1080px; }
+.taxonomy-node .node-copy { justify-content: center; }
+
+.routing-card .routing-status { justify-content: flex-end; margin-bottom: 17px; }
+.routing-card .routing-status .chip { padding: 7px 11px; font-size: 11px; }
+.routing-card .route-events { gap: 8px; margin-top: 18px; }
+.routing-card .route-events span {
+  padding: 9px 12px;
+  border: 1px solid rgba(98, 166, 255, .2);
+  border-radius: 9px;
+  color: #c7e2ff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+}
 
 .media-method > div { background: rgba(255, 255, 255, .035); }
 .reason-strip span, .annotation-strip span { color: #a2bac7; font-size: 11px; }
@@ -425,7 +442,7 @@ dialog::backdrop { background: rgba(0, 8, 15, .78); }
   .section-toolbar input { height: 42px; font-size: 13px; }
   .section-toolbar select { height: 42px; font-size: 12px; }
   .section-toolbar button { height: 42px; min-width: 70px; font-size: 12px; }
-  .result-caption { height: auto; min-height: 30px; font-size: 10px; line-height: 1.5; }
+  .result-caption { height: auto; min-height: 36px; padding: 6px 2px; font-size: 12px; line-height: 1.5; }
 
   .taxonomy-summary { grid-template-columns: 1fr; }
   .taxonomy-summary .scope-stat { border-right: 0; border-bottom: 1px solid var(--line); }

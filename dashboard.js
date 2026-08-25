@@ -24,7 +24,6 @@ const labels = {
   confirmed:'已确认', corroborated:'多源印证', reported:'已报道', unverified:'待核验',
   positive:'正面影响', negative:'负面影响', neutral:'影响中性', uncertain:'影响尚不明确',
   fact:'事实陈述', rumor:'传闻信息', denial:'否认或澄清',
-  unique_earliest_observation:'唯一最早观测', tied_earliest_observations:'最早时间并列',
   developing:'持续发展', reassessing:'需要重新判断', resolved:'已有结果',
   INVALID_CONTENT:'无效内容', NO_SCHEMA_MATCH:'未被当前事件体系覆盖', NO_EVENT:'没有形成可提取事件', INSUFFICIENT_EVIDENCE:'证据不足',
   EVENT_CARD_MISMATCH:'事件卡不匹配',
@@ -151,7 +150,7 @@ function eventCard(item, kind = 'instances') {
 }
 function repostCard(item) {
   return `<article class="data-card repost-card" data-detail-kind="reposts" data-id="${esc(item.repost_group_id)}">
-    <div class="card-top"><code>${esc(item.repost_group_id)}</code>${chip(item.origin_status)}</div>
+    <div class="card-top"><code>${esc(item.repost_group_id)}</code></div>
     <h3>${esc(clip(item.title, 180))}</h3>
     <div class="meta-line repost-stats"><span>${fmt(item.article_count)} 篇完全同文</span><span>${fmt(item.media_count)} 家媒体</span><span>点击查看完整转载链 →</span></div>
   </article>`;
@@ -192,7 +191,7 @@ function orderTaxonomyRoots(roots) {
 }
 function taxonomyNode(item, level, descendantCount = 0) {
   return `<button class="taxonomy-node level-${level}" data-event-node="${esc(item.event_id)}">
-    <span class="node-level">L${level}</span><span class="node-copy"><b>${esc(item.event_name)}</b><small>${esc(item.event_id)}${descendantCount ? ` · ${descendantCount} 个下级事件` : ''}</small></span><span class="node-open">${icon('arrow')}</span>
+    <span class="node-level">L${level}</span><span class="node-copy"><b>${esc(item.event_name)}</b>${descendantCount ? `<small>${descendantCount} 个下级事件</small>` : ''}</span><span class="node-open">${icon('arrow')}</span>
   </button>`;
 }
 function renderTaxonomyTree(rows, query) {
@@ -227,10 +226,10 @@ async function loadTaxonomy() {
     const query = $('[data-search="taxonomy"]').value.trim();
     const scope = $('[data-filter="taxonomy"]').value;
     const scoped = taxonomy.filter(item => scope === 'all' || item.scope === scope);
-    const company = taxonomy.filter(item => item.scope === 'company').length;
-    const industry = taxonomy.filter(item => item.scope === 'industry').length;
-    const roots = taxonomy.filter(item => Number(item.level) === 1).length;
-    $('#taxonomy-overview').innerHTML = `<div class="scope-stat"><span>公司级事件</span><b>${fmt(company)}<em>张</em></b><small>企业经营活动与风险</small></div><div class="scope-stat"><span>产业级事件</span><b>${fmt(industry)}<em>张</em></b><small>产业、政策与宏观变化</small></div><div class="scope-stat"><span>一级事件域</span><b>${fmt(roots)}<em>个</em></b><small>点击后逐级展开到三级</small></div>`;
+    const level1 = taxonomy.filter(item => Number(item.level) === 1).length;
+    const level2 = taxonomy.filter(item => Number(item.level) === 2).length;
+    const level3 = taxonomy.filter(item => Number(item.level) === 3).length;
+    $('#taxonomy-overview').innerHTML = `<div class="scope-stat"><span>一级事件</span><b>${fmt(level1)}<em>个</em></b><small>公司级与产业级核心领域</small></div><div class="scope-stat"><span>二级事件</span><b>${fmt(level2)}<em>个</em></b><small>对一级事件进一步细分</small></div><div class="scope-stat"><span>三级事件</span><b>${fmt(level3)}<em>个</em></b><small>用于新闻内容的精确匹配</small></div>`;
     $('#taxonomy-results').innerHTML = renderTaxonomyTree(scoped.filter(item => Number(item.level) === 1), query);
     $$('.tree-toggle').forEach(button => button.onclick = event => {
       event.stopPropagation();
@@ -251,7 +250,7 @@ async function loadRouting() {
     state.totalPages = data.total_pages || null;
     setCaption('routing', data, '新闻事件匹配');
     $('#routing-results').innerHTML = data.items.map(item => `<article class="data-card routing-card" data-detail-kind="routes" data-api="upstream" data-id="${esc(item.input_row_id)}">
-      <div class="card-top"><code>${esc(item.input_row_id)}</code>${chip(item.route_status)}</div><h3>${esc(clip(item.article_title, 170))}</h3><p>${esc(clip(item.content_preview, 180))}</p>
+      <div class="card-top routing-status">${chip(item.route_status)}</div><h3>${esc(clip(item.article_title, 170))}</h3><p>${esc(clip(item.content_preview, 180))}</p>
       ${item.final_event_ids?.length ? `<div class="route-events">${item.routed_events.slice(0, 3).map(event => `<span>${esc(event.event_name)}</span>`).join('')}</div>` : `<div class="reason-box"><b>未形成事件的原因：</b>${esc(textLabel(item.trash_reason))}</div>`}
       <div class="meta-line"><span>${esc(item.article_source)}</span><span>${esc(item.article_publish_time)}</span></div></article>`).join('') || empty();
     renderPager('routing'); bindDetailCards();
