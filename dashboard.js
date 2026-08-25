@@ -60,7 +60,7 @@ const sectionGuides = {
   dedup: {number:'05', title:'重复事件合并', summary:'识别新闻转载链与同一事件的不同报道，本页面分别展示新闻转载链和事件合并结果。', process:['识别正文完全相同的转载，形成传播顺序。','比较主体、事实、时间和语义，判断不同报道是否指向同一事件。','将相同事件合并，同时保留全部来源证据。'], points:['“同文转载”展示相同正文如何在媒体间传播。','“事件合并”展示不同写法如何归并为同一事实。','点击卡片可逐篇查看合并前新闻与最终事件。']},
   library: {number:'06', title:'最终统一事件', summary:'展示原始新闻经过事件匹配、关键信息提取、过滤与去重后形成的完整事件库。', process:['有效结果经过重复识别和语义合并，形成最终事件。','根据独立媒体、原始资料和后续确认计算可信度。','汇总事件事实、影响方向、来源证据和解释信息。'], points:['每张卡展示可信度、来源规模和后续确认次数。','点击后可从最终结论追溯到每篇原始新闻。','可信度和影响方向均给出清晰的判断依据。']},
   media: {number:'07', title:'媒体可信分析', summary:'每一条新闻的置信度会反馈影响对应媒体的可信度，本页展示媒体可信度及信誉变更记录。', process:['新闻先关联到对应的最终事件。','等待更多独立报道和后续事实出现。','根据事件最终结果更新媒体表现，并逐笔保存变化原因。'], points:['获得后续证实的报道产生正向反馈。','未形成有效事件或可信度较低的报道产生相应反馈。','点击每笔变化可查看触发新闻、后续证据和分数前后变化。']},
-  chains: {number:'08', title:'事件发展脉络', summary:'相关事件会被系统识别并整合为清晰的发展脉络，本页展示事件链及关键节点标签。', process:['从最终事件中选择主体一致、主题一致且关系明确的节点。','按起因、推进、市场反应、处置和结果整理逻辑。','依据完整发布时间排序，形成可追溯的事件发展脉络。'], points:['重点事件链均强调节点之间的真实联系与连贯逻辑。','每条链归属一个最适合的一级事件类型。','点击节点可查看对应原始新闻，核对时间与事实。']},
+  chains: {number:'08', title:'事件发展脉络', summary:'相关事件会被系统识别并整合为清晰的发展脉络，本页展示事件链及关键节点标签。', process:['从最终事件中选择主体一致、主题一致且关系明确的节点。','按起因、推进、市场反应、处置和结果整理逻辑。','依据完整发布时间排序，形成可追溯的事件发展脉络。'], points:['事件链节点之间具有明确联系与连贯逻辑。','每条链归属一个最适合的一级事件类型。','点击节点可查看对应原始新闻，核对时间与事实。']},
 };
 
 async function getJson(url) {
@@ -83,7 +83,7 @@ function upstreamQuery(kind, options = {}) {
   if (kind === 'events') params.scope = options.state || 'all';
   return getJson('/api/query?' + new URLSearchParams(params));
 }
-function showLoading(selector, label = '正在读取真实结果') {
+function showLoading(selector, label = '正在加载数据') {
   $(selector).innerHTML = `<div class="loader">${esc(label)}</div>`;
 }
 function empty(message = '没有找到符合条件的记录', error = false) {
@@ -91,7 +91,7 @@ function empty(message = '没有找到符合条件的记录', error = false) {
 }
 function setCaption(view, data, label) {
   const element = $(`#${view}-caption`);
-  if (element) element.textContent = `${label}${data.showcase_priority ? ' · 优先展示代表性结果' : ''} · 本页 ${data.items.length} 条 · 第 ${data.page} 页`;
+  if (element) element.textContent = `${label} · 本页 ${data.items.length} 条 · 第 ${data.page} 页`;
 }
 function renderPager(view) {
   const container = $(`[data-pager="${view}"]`);
@@ -331,7 +331,7 @@ async function loadChains() {
     const data = await intelligenceQuery('chains', {page:state.page, size:8, q:$('[data-search="chains"]').value.trim(), state:$('[data-filter="chains"]').value});
     state.more = data.has_more;
     state.totalPages = data.total_pages;
-    setCaption('chains', data, state.page <= 3 ? '重点事件发展脉络' : '事件发展脉络');
+    setCaption('chains', data, '事件发展脉络');
     $('#chains-results').innerHTML = data.items.map(chainCard).join('') || empty();
     renderPager('chains'); bindDetailCards();
   } catch (error) { $('#chains-results').innerHTML = empty(error.message, true); }
@@ -442,7 +442,7 @@ function impactEvidence(record) {
   const reasons = record.impact_explanations || [];
   const direction = impactText(record);
   const title = direction && direction !== '未判断' ? `${direction}的判断依据` : '影响方向判断依据';
-  if (!reasons.length) return `<section class="impact-evidence empty-evidence"><header><span>${icon('arrow')}</span><div><b>${title}</b><small>基于新闻事实分析</small></div></header><p>当前事件尚未生成可展示的影响理由。</p></section>`;
+  if (!reasons.length) return `<section class="impact-evidence empty-evidence"><header><span>${icon('arrow')}</span><div><b>${title}</b><small>基于新闻事实分析</small></div></header><p>当前事件暂无明确的影响理由。</p></section>`;
   const representative = reasons[0];
   return `<section class="impact-evidence"><header><span>${icon('arrow')}</span><div><b>${title}</b><small>基于新闻事实分析</small></div></header><article><p>${esc(representative.reason)}</p></article></section>`;
 }
@@ -476,7 +476,7 @@ function eventVerificationContext(update, instance) {
   const related = verificationMembers(update, instance);
   const score = Number(instance.credibility_score || 0);
   const scoreText = `${Math.round(score * 100)}分（${score.toFixed(3)}）`;
-  return `<section class="media-confirmations"><header><span>${icon('check')}</span><div><b>后续确认与交叉验证</b><small>该事件的后续可信度：${scoreText}</small></div></header><div class="verification-metrics"><span><b>${fmt(instance.publisher_count)}</b>家媒体</span><span><b>${fmt(instance.article_count)}</b>篇报道</span><span><b>${fmt(instance.followup_confirmation_count)}</b>次后续确认</span></div>${related.length ? `${sourceBrowser(related, 'media-confirmation-reader')}` : '<p class="no-verification">当前没有可展示的其他交叉验证新闻。</p>'}</section>`;
+  return `<section class="media-confirmations"><header><span>${icon('check')}</span><div><b>后续确认与交叉验证</b><small>该事件的后续可信度：${scoreText}</small></div></header><div class="verification-metrics"><span><b>${fmt(instance.publisher_count)}</b>家媒体</span><span><b>${fmt(instance.article_count)}</b>篇报道</span><span><b>${fmt(instance.followup_confirmation_count)}</b>次后续确认</span></div>${related.length ? `${sourceBrowser(related, 'media-confirmation-reader')}` : '<p class="no-verification">当前暂无其他交叉验证新闻。</p>'}</section>`;
 }
 function renderMediaRecordDetail(publisher, update, article, instance) {
   const increase = update.action === 'increase';
@@ -557,7 +557,7 @@ async function openDetail(kind, identity, apiType = 'intelligence') {
   const body = $('#detail-body');
   if (kind === 'media') mediaRecordParent = null;
   if (!dialog.open) dialog.showModal();
-  body.innerHTML = '<div class="detail-content"><div class="loader">正在整理展示内容</div></div>';
+  body.innerHTML = '<div class="detail-content"><div class="loader">正在加载详细信息</div></div>';
   try {
     const endpoint = apiType === 'upstream' ? '/api/detail' : '/api/intelligence/detail';
     const record = await getJson(`${endpoint}?kind=${encodeURIComponent(kind)}&id=${encodeURIComponent(identity)}`);
@@ -565,7 +565,7 @@ async function openDetail(kind, identity, apiType = 'intelligence') {
       events:renderEventDefinition, routes:renderRouteDetail, mentions:renderMentionDetail, quality:renderQualityDetail,
       reposts:renderRepostDetail, merges:renderMergeDetail, instances:renderInstanceDetail, media:renderMediaDetail, chains:renderChainDetail
     };
-    body.innerHTML = renderers[kind] ? renderers[kind](record) : empty('暂无对应展示模板');
+    body.innerHTML = renderers[kind] ? renderers[kind](record) : empty('暂无详细信息');
     if (kind === 'media') bindMediaRecordDetails(body, record.publisher_family);
     else if (['reposts','merges','instances'].includes(kind)) bindArticleReaders(body);
     else if (kind === 'chains') bindChainNewsDetails(body);
