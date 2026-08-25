@@ -159,7 +159,7 @@ function chainCard(item) {
   const nodes = item.nodes || [];
   return `<article class="chain-card" data-detail-kind="chains" data-id="${esc(item.event_chain_id)}">
     <div class="chain-head"><div><span class="chain-symbol">${icon('chain')}</span><div class="chain-topic"><small>事件链追踪主题</small><b>${esc(item.chain_name || (nodes[0]?.fact ? clip(nodes[0].fact, 66) : '事件发展脉络'))}</b><span class="chain-primary-event">一级事件 · ${esc(item.primary_event_name || '待归类')}<code>${esc(item.primary_event_id || '')}</code></span></div></div><div>${chip(item.current_state)}${chip(`${item.node_count} 个节点`, 'info')}</div></div>
-    <div class="storyline">${nodes.map(node => `<div class="story-node"><time>${esc(node.publish_time || node.date || '时间待定')}</time><p>${esc(clip(node.fact, 125))}</p><div class="node-tags">${(node.annotations || []).map(tag => `<span class="${['反转','预警','风险升级'].includes(tag) ? 'alert' : ''}">${esc(tag)}</span>`).join('')}</div></div>`).join('')}</div>
+    <div class="storyline">${nodes.map(node => `<div class="story-node"><time>${esc(node.publish_time || node.date || '时间待定')}</time><p>${esc(clip(node.fact, 125))}</p><div class="node-tags">${(node.annotations || []).map(tag => `<span class="${['反转','预警','预警升级'].includes(tag) ? 'alert' : ''}">${esc(tag)}</span>`).join('')}</div></div>`).join('')}</div>
     <div class="open-hint">点击查看完整事件链 <span>→</span></div>
   </article>`;
 }
@@ -171,7 +171,7 @@ async function loadSummary() {
   const qualityReasons = summary.quality_reason_counts || {};
   $('#quality-reasons').innerHTML = Object.entries(qualityReasons).filter(([key]) => key !== 'content_shorter_than_repost_minimum').map(([key, value]) => `<span>${esc(textLabel(key))}<b>${fmt(value)}</b></span>`).join('');
   const annotations = summary.chain_annotations || {};
-  $('#chain-annotations').innerHTML = [['反转',annotations.reversal],['预警',annotations.warning],['重大进展',annotations.major_progress],['官方确认',annotations.official_confirmation],['重新预警',annotations.realerts]].map(([key, value]) => `<span>${key}<b>${fmt(value)}</b></span>`).join('');
+  $('#chain-annotations').innerHTML = [['反转',annotations.reversal],['预警',annotations.warning],['预警升级',annotations.realerts],['重大进展',annotations.major_progress],['官方确认',annotations.official_confirmation]].map(([key, value]) => `<span>${key}<b>${fmt(value)}</b></span>`).join('');
 }
 
 function pathParts(item) { return String(item.source_path || '').split(' > ').filter(Boolean); }
@@ -506,7 +506,7 @@ function bindMediaRecordDetails(container, publisher) {
 }
 function renderChainDetail(record) {
   const nodes = record.nodes || [];
-  return detailFrame('事件链详情', record.chain_name || (nodes[0]?.fact ? clip(nodes[0].fact, 80) : '完整事件链'), `<div class="chain-primary-event-detail"><span>归属一级事件</span><code>${esc(record.primary_event_id || '—')}</code><b>${esc(record.primary_event_name || '待归类')}</b></div><div class="chain-detail-topic"><span>追踪主题</span><b>${esc(record.chain_name || '事件发展脉络')}</b></div><div class="polished-chain">${nodes.map((node, index) => `<article class="polished-node ${node.news_id ? 'is-openable' : ''}" ${node.news_id ? `data-chain-news-id="${esc(node.news_id)}" tabindex="0" role="button" aria-label="查看第 ${index + 1} 个节点对应新闻详情"` : ''}><div class="node-rail"><span>${index + 1}</span>${index < nodes.length - 1 ? '<i></i>' : ''}</div><div class="node-body"><time>${esc(node.publish_time || node.date || '时间待定')}</time><p>${esc(node.fact)}</p><div class="node-tags">${(node.annotations || []).map(tag => `<span class="${['反转','预警','风险升级'].includes(tag) ? 'alert' : ''}">${esc(tag)}</span>`).join('') || '<span>持续跟踪</span>'}</div>${node.news_id ? '<span class="chain-news-open">点击卡片查看对应新闻详情 →</span>' : ''}</div></article>`).join('')}</div>`, 'chain-detail');
+  return detailFrame('事件链详情', record.chain_name || (nodes[0]?.fact ? clip(nodes[0].fact, 80) : '完整事件链'), `<div class="chain-primary-event-detail"><span>归属一级事件</span><code>${esc(record.primary_event_id || '—')}</code><b>${esc(record.primary_event_name || '待归类')}</b></div><div class="chain-detail-topic"><span>追踪主题</span><b>${esc(record.chain_name || '事件发展脉络')}</b></div><div class="polished-chain">${nodes.map((node, index) => `<article class="polished-node ${node.news_id ? 'is-openable' : ''}" ${node.news_id ? `data-chain-news-id="${esc(node.news_id)}" tabindex="0" role="button" aria-label="查看第 ${index + 1} 个节点对应新闻详情"` : ''}><div class="node-rail"><span>${index + 1}</span>${index < nodes.length - 1 ? '<i></i>' : ''}</div><div class="node-body"><time>${esc(node.publish_time || node.date || '时间待定')}</time><p>${esc(node.fact)}</p><div class="node-tags">${(node.annotations || []).map(tag => `<span class="${['反转','预警','预警升级'].includes(tag) ? 'alert' : ''}">${esc(tag)}</span>`).join('')}</div>${node.news_id ? '<span class="chain-news-open">点击卡片查看对应新闻详情 →</span>' : ''}</div></article>`).join('')}</div>`, 'chain-detail');
 }
 
 function renderChainNewsDetail(article) {
