@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#07111f">
   <title>EventScope · 新闻事件智能分析平台</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%230b2033'/%3E%3Cg fill='none' stroke='%235de2da' stroke-width='3'%3E%3Cpath d='M18 33 42 19M18 33l25 14'/%3E%3C/g%3E%3Cg fill='%235de2da'%3E%3Ccircle cx='17' cy='33' r='5'/%3E%3Ccircle cx='43' cy='18' r='5'/%3E%3Ccircle cx='44' cy='47' r='5'/%3E%3C/g%3E%3C/svg%3E">
-  <link rel="stylesheet" href="dashboard.css?v=20260825-showcase-polish-v3">
-  <link rel="stylesheet" href="showcase-polish.css?v=20260825-showcase-polish-v3">
+  <link rel="stylesheet" href="dashboard.css?v=20260825-showcase-polish-v4">
+  <link rel="stylesheet" href="showcase-polish.css?v=20260825-showcase-polish-v4">
 </head>
 <body>
   <div class="noise"></div>
@@ -17,12 +17,12 @@
       <span><b>EventScope</b><small>新闻事件智能分析平台</small></span>
     </a>
     <nav class="module-nav" id="module-nav">
-      <button class="active" data-view="taxonomy"><em>01</em><span><b>事件分类标准</b></span></button>
-      <button data-view="routing"><em>02</em><span><b>新闻事件匹配</b></span></button>
+      <button class="active" data-view="taxonomy"><em>01</em><span><b>标准事件体系</b></span></button>
+      <button data-view="routing"><em>02</em><span><b>事件匹配结果</b></span></button>
       <button data-view="mentions"><em>03</em><span><b>关键信息提取</b></span></button>
       <button data-view="quality"><em>04</em><span><b>无效新闻过滤</b></span></button>
-      <button data-view="dedup"><em>05</em><span><b>重复报道合并</b></span></button>
-      <button data-view="library"><em>06</em><span><b>最终事件成果</b></span></button>
+      <button data-view="dedup"><em>05</em><span><b>重复事件合并</b></span></button>
+      <button data-view="library"><em>06</em><span><b>最终统一事件</b></span></button>
       <button data-view="media"><em>07</em><span><b>媒体可信分析</b></span></button>
       <button data-view="chains"><em>08</em><span><b>事件发展脉络</b></span></button>
     </nav>
@@ -30,58 +30,58 @@
 
   <main class="app-shell">
     <header class="topbar">
-      <div class="top-title"><span id="section-number">01</span><div><b id="section-title">事件分类标准</b><small id="section-subtitle" aria-hidden="true"></small></div><button class="section-guide" id="section-guide" type="button">了解这一步</button></div>
+      <div class="top-title"><span id="section-number">01</span><div><b id="section-title">标准事件体系</b><small id="section-subtitle" aria-hidden="true"></small></div><button class="section-guide" id="section-guide" type="button">了解这一步</button></div>
       <div class="top-context"><span>项目成果展示</span><i></i><b>8 个核心环节</b></div>
     </header>
 
-    <section class="workspace-view active" id="view-taxonomy" data-title="事件分类标准" data-subtitle="" data-number="01">
-      <div class="view-heading"><div><span class="step-kicker">流程第 1 步 · 先建立统一标准</span><h1>先定义“什么是事件”，再让每条新闻准确归类</h1><p>这里展示项目最终采用的事件分类卡。每张卡都明确“事件是什么、哪些情况应收录、哪些情况应排除”，后续新闻匹配、信息提取和事件合并都以它为统一标准。</p></div><div class="heading-metrics"><span><b data-metric="event_cards">—</b> 张最终分类卡</span><span><b>3</b> 级分类结构</span></div></div>
+    <section class="workspace-view active" id="view-taxonomy" data-title="标准事件体系" data-subtitle="" data-number="01">
+      <div class="view-heading"><div><span class="step-kicker">第 1 步</span><h1>定义通用的标准事件</h1><p>展示最终的事件分类卡。明确“事件是什么、哪些情况应收录、哪些情况应排除”，后续新闻匹配、信息提取和事件合并都以它为统一标准。</p></div><div class="heading-metrics"><span><b data-metric="event_cards">—</b> 张最终分类卡</span><span><b>3</b> 级分类结构</span></div></div>
       <div class="section-toolbar"><label><span>⌕</span><input data-search="taxonomy" placeholder="搜索事件名称、定义或分类卡编号"></label><select data-filter="taxonomy"><option value="all">全部分类</option><option value="company">公司级</option><option value="industry">产业级</option></select><button data-run="taxonomy">搜索</button></div>
       <div class="taxonomy-overview taxonomy-summary" id="taxonomy-overview"></div>
       <div class="taxonomy-tree" id="taxonomy-results"><div class="loader">正在加载三级事件体系</div></div>
     </section>
 
-    <section class="workspace-view" id="view-routing" data-title="新闻事件匹配" data-subtitle="" data-number="02">
-      <div class="view-heading"><div><span class="step-kicker">流程第 2 步 · 判断新闻属于哪类事件</span><h1>新闻与事件类型匹配</h1><p>系统逐条判断新闻属于哪一种事件类型。匹配成功的新闻进入关键信息提取；没有形成明确事件的内容会保留具体原因，结果可追溯、可核对。</p></div><div class="heading-metrics"><span><b data-metric="route_rows">—</b> 新闻处理结果</span><span><b data-metric="filtered_articles">—</b> 未形成有效事件</span></div></div>
+    <section class="workspace-view" id="view-routing" data-title="事件匹配结果" data-subtitle="" data-number="02">
+      <div class="view-heading"><div><span class="step-kicker">第 2 步</span><h1>新闻与事件类型匹配</h1><p>系统逐条判断新闻属于哪一种事件类型。匹配成功的新闻进入关键信息提取；没有形成明确事件的内容会保留具体原因。本页展示匹配结果。</p></div><div class="heading-metrics"><span><b data-metric="route_rows">—</b> 新闻处理结果</span><span><b data-metric="filtered_articles">—</b> 未形成有效事件</span></div></div>
       <div class="section-toolbar"><label><span>⌕</span><input data-search="routing" placeholder="搜索新闻标题、媒体、事件类型或新闻编号"></label><select data-filter="routing"><option value="all">全部匹配结果</option><option value="matched">匹配成功</option><option value="trash">未形成事件</option></select><button data-run="routing">搜索</button></div>
       <div class="result-caption" id="routing-caption"></div><div class="result-grid" id="routing-results"></div><div class="pager" data-pager="routing"></div>
     </section>
 
     <section class="workspace-view" id="view-mentions" data-title="关键信息提取" data-subtitle="" data-number="03">
-      <div class="view-heading"><div><span class="step-kicker">流程第 3 步 · 把长新闻变成结构化事件</span><h1>从新闻中提取关键信息</h1><p>把长篇新闻整理为统一字段：谁、发生了什么、何时发生、影响方向是什么，并保留对应原文证据，便于后续计算和人工核对。</p></div><div class="heading-metrics"><span><b data-metric="mention_rows">—</b> 信息提取结果</span><span><b data-metric="valid_mentions">—</b> 有效结构化事件</span></div></div>
+      <div class="view-heading"><div><span class="step-kicker">第 3 步</span><h1>从新闻中提取关键信息</h1><p>从长篇新闻中抽取关键信息：主体是谁、发生了什么、何时发生等，本页展示抽取结果。</p></div><div class="heading-metrics"><span><b data-metric="mention_rows">—</b> 信息提取结果</span><span><b data-metric="valid_mentions">—</b> 有效结构化事件</span></div></div>
       <div class="section-toolbar"><label><span>⌕</span><input data-search="mentions" placeholder="搜索主体、事件事实、媒体或编号"></label><select data-filter="mentions"><option value="all">全部提取结果</option><option value="true">有效结果</option><option value="false">无效结果</option></select><button data-run="mentions">搜索</button></div>
       <div class="result-caption" id="mentions-caption"></div><div class="result-grid" id="mentions-results"></div><div class="pager" data-pager="mentions"></div>
     </section>
 
     <section class="workspace-view" id="view-quality" data-title="无效新闻过滤" data-subtitle="" data-number="04">
-      <div class="view-heading"><div><span class="step-kicker">质量控制 · 拦截不构成事件的内容</span><h1>过滤无效或低质量新闻</h1><p>广告、残缺文本、抓取失败和没有明确事实的内容不会进入事件库。每条被过滤的新闻都保留原文和具体原因，避免噪声影响最终结果。</p></div><div class="heading-metrics"><span><b data-metric="filtered_articles">—</b> 条过滤记录</span></div></div>
+      <div class="view-heading"><div><span class="step-kicker">第 4 步</span><h1>过滤无效或低质量新闻</h1><p>过滤广告、残缺文本、抓取失败和没有明确事实的新闻，避免噪声影响最终结果，并保留原文和具体原因。本页面展示过滤结果。</p></div><div class="heading-metrics"><span><b data-metric="filtered_articles">—</b> 条过滤记录</span></div></div>
       <div class="reason-strip" id="quality-reasons"></div>
       <div class="section-toolbar"><label><span>⌕</span><input data-search="quality" placeholder="搜索标题、媒体、新闻编号或过滤原因"></label><select data-filter="quality"><option value="filtered">明确过滤内容</option><option value="all">全部排除记录</option></select><button data-run="quality">搜索</button></div>
       <div class="result-caption" id="quality-caption"></div><div class="result-grid" id="quality-results"></div><div class="pager" data-pager="quality"></div>
     </section>
 
-    <section class="workspace-view" id="view-dedup" data-title="重复报道合并" data-subtitle="" data-number="05">
-      <div class="view-heading"><div><span class="step-kicker">流程第 4 步 · 避免同一事件被重复计算</span><h1>把多篇重复报道合并成一个事件</h1><p>先识别完全相同的转载，再判断不同媒体是否在描述同一个事实，最终把重复内容合并为一条统一事件，同时保留全部来源证据。</p></div><div class="heading-metrics"><span><b data-metric="exact_repost_groups">—</b> 组同文转载</span><span><b data-metric="instances_reduced">—</b> 条重复事件已合并</span></div></div>
+    <section class="workspace-view" id="view-dedup" data-title="重复事件合并" data-subtitle="" data-number="05">
+      <div class="view-heading"><div><span class="step-kicker">第 5 步</span><h1>合并重复报道为统一事件</h1><p>识别同一新闻的转载链路，判断不同媒体是否在描述同一事实，最终把重复内容合并为统一事件，并保留全部来源证据。本页面分别展示了新闻转载链与事件合并结果。</p></div><div class="heading-metrics"><span><b data-metric="exact_repost_groups">—</b> 组同文转载</span><span><b data-metric="instances_reduced">—</b> 条重复事件已合并</span></div></div>
       <div class="mode-switch" id="dedup-switch"><button class="active" data-dedup-kind="reposts"><span>01</span><b>同文转载识别</b><small>查看相同正文如何在不同媒体间传播</small></button><button data-dedup-kind="merges"><span>02</span><b>重复事件合并</b><small>查看不同新闻如何合并成同一个事件</small></button></div>
       <div class="section-toolbar"><label><span>⌕</span><input data-search="dedup" placeholder="搜索转载标题、媒体或合并后的事件"></label><button data-run="dedup">搜索</button></div>
       <div class="result-caption" id="dedup-caption"></div><div class="result-grid" id="dedup-results"></div><div class="pager" data-pager="dedup"></div>
     </section>
 
-    <section class="workspace-view" id="view-library" data-title="最终事件成果" data-subtitle="" data-number="06">
-      <div class="view-heading"><div><span class="step-kicker">核心成果 · 形成统一、可信、可解释的事件库</span><h1>最终事件成果</h1><p>每个事件汇总多家媒体的报道证据，并给出事件事实、可信度、影响方向以及评分依据。点击任意卡片即可从结论追溯到原始新闻。</p></div><div class="heading-metrics"><span><b data-metric="event_instances">—</b> 条最终事件</span><span><b data-metric="reporting_paths">—</b> 条多源证据路径</span></div></div>
+    <section class="workspace-view" id="view-library" data-title="最终统一事件" data-subtitle="" data-number="06">
+      <div class="view-heading"><div><span class="step-kicker">第 6 步</span><h1>最终统一事件</h1><p>本页面展示原始新闻经过事件匹配、关键信息提取、过滤与去重后的完整事件库。</p></div><div class="heading-metrics"><span><b data-metric="event_instances">—</b> 条最终事件</span><span><b data-metric="reporting_paths">—</b> 条多源证据路径</span></div></div>
       <div class="section-toolbar"><label><span>⌕</span><input data-search="library" placeholder="搜索事件事实、主体、领域或事件编号"></label><select data-filter="library"><option value="all">全部可信等级</option><option value="high">高可信</option><option value="medium">中可信</option><option value="low">低可信</option></select><button data-run="library">搜索</button></div>
       <div class="result-caption" id="library-caption"></div><div class="result-grid event-library" id="library-results"></div><div class="pager" data-pager="library"></div>
     </section>
 
     <section class="workspace-view" id="view-media" data-title="媒体可信分析" data-subtitle="" data-number="07">
-      <div class="view-heading"><div><span class="step-kicker">结果反馈 · 用后续事实检验最初报道</span><h1>媒体可信度如何形成</h1><p>当事件被更多独立来源证实或否定时，系统回看最初报道并更新对应媒体的表现。每一次分数变化都能查看触发新闻、后续证据和具体原因。</p></div><div class="heading-metrics"><span><b data-metric="media_profiles">—</b> 份媒体档案</span><span><b data-metric="media_updates">—</b> 次事实反馈</span></div></div>
+      <div class="view-heading"><div><span class="step-kicker">第 7 步</span><h1>媒体可信度分析</h1><p>每一条新闻的置信度会反馈影响其对应的媒体可信度，本页面展示不同媒体的可信度及其信誉变更记录。</p></div><div class="heading-metrics"><span><b data-metric="media_profiles">—</b> 份媒体档案</span><span><b data-metric="media_updates">—</b> 次事实反馈</span></div></div>
       <div class="media-method"><div><span class="up">↗</span><b>报道获得后续证实</b><small>提高对应媒体的可信表现</small></div><div><span class="flat">—</span><b>事件尚无明确结论</b><small>保持待定，不提前奖惩</small></div><div><span class="down">↘</span><b>报道未形成有效事件</b><small>根据具体原因留下负向反馈</small></div></div>
       <div class="section-toolbar"><label><span>⌕</span><input data-search="media" placeholder="搜索媒体名称"></label><select data-filter="media"><option value="all">全部可信等级</option><option value="high">高可信</option><option value="medium">中可信</option><option value="watch">观察</option><option value="insufficient_sample">样本不足</option></select><button data-run="media">搜索</button></div>
       <div class="result-caption" id="media-caption"></div><div class="result-grid media-grid" id="media-results"></div><div class="pager" data-pager="media"></div>
     </section>
 
     <section class="workspace-view" id="view-chains" data-title="事件发展脉络" data-subtitle="" data-number="08">
-      <div class="view-heading"><div><span class="step-kicker">价值展示 · 从孤立事件看见完整发展过程</span><h1>把相关事件串成清晰的发展脉络</h1><p>围绕同一主题按时间连接起因、推进、市场反应和结果，让评委一眼看懂事件如何演变。</p></div><div class="heading-metrics"><span><b data-metric="event_chains">—</b> 条事件链</span><span><b>24</b> 条重点展示</span><span><b data-metric="alerts">—</b> 个风险节点</span></div></div>
+      <div class="view-heading"><div><span class="step-kicker">第 8 步</span><h1>事件发展脉络</h1><p>相关事件会被系统识别整合为清晰的发展脉络，本页面展示各个事件链及关键节点标签。</p></div><div class="heading-metrics"><span><b data-metric="event_chains">—</b> 条事件链</span><span><b>24</b> 条重点展示</span><span><b data-metric="alerts">—</b> 个风险节点</span></div></div>
       <div class="annotation-strip" id="chain-annotations"></div>
       <div class="section-toolbar"><label><span>⌕</span><input data-search="chains" placeholder="搜索公司、主题或节点内容"></label><select data-filter="chains"><option value="all">全部事件链</option><option value="confirmed">脉络完整</option><option value="developing">持续发展</option><option value="reassessing">需要重新判断</option></select><button data-run="chains">搜索</button></div>
       <div class="result-caption" id="chains-caption"></div><div class="chain-list" id="chains-results"></div><div class="pager" data-pager="chains"></div>
@@ -93,6 +93,6 @@
   <dialog id="detail-dialog"><button class="dialog-close" aria-label="关闭">×</button><div id="detail-body"></div></dialog>
   <dialog id="article-detail-dialog"><button class="dialog-close" aria-label="关闭新闻详情">×</button><div id="article-detail-body"></div></dialog>
   <dialog id="guide-dialog"><button class="dialog-close" aria-label="关闭说明">×</button><div id="guide-body"></div></dialog>
-  <script src="static-api.js?v=20260825-showcase-polish-v3"></script><script src="dashboard.js?v=20260825-showcase-polish-v3"></script>
+  <script src="static-api.js?v=20260825-showcase-polish-v4"></script><script src="dashboard.js?v=20260825-showcase-polish-v4"></script>
 </body>
 </html>
