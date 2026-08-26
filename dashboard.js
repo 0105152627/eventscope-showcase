@@ -451,7 +451,7 @@ function sourceBrowser(members, readerId) {
   return `<div class="source-browser"><div class="source-list">${members.map((member, index) => `<button class="source-item ${index === 0 ? 'active' : ''}" data-article-reader="${readerId}" data-article-id="${esc(member.news_id)}"><span>${String(index + 1).padStart(2, '0')}</span><div><b>${esc(member.title || '标题暂缺')}</b><small>${esc(member.publisher || '来源未知')}</small></div></button>`).join('')}</div><article class="source-reader" id="${readerId}"><div class="reader-placeholder"><span>${icon('article')}</span><b>点击左侧新闻查看正文</b></div></article></div>`;
 }
 function renderMergeDetail(record) {
-  const members = record.members || [];
+  const members = record.merge_members || record.members || [];
   return detailFrame('重复事件合并详情', '多条新闻合并为一个统一事件', `<div class="merge-workbench"><section class="merge-sources"><header class="section-label"><span>${icon('article')}</span><b>合并前的新闻（${fmt(members.length)}条）</b></header>${sourceBrowser(members, 'merge-article-reader')}</section><div class="merge-arrow"><i>${icon('arrow')}</i><span>语义合并</span></div><section class="merged-result"><header><span>${icon('merge')}</span><b>合并后的事件</b></header><p>${esc(record.canonical_fact)}</p>${record.llm_merge_reason ? `<div class="llm-human-note"><b>为什么可以合并</b>${esc(record.llm_merge_reason)}</div>` : ''}</section></div>`, 'merge-detail');
 }
 function impactText(record) {
