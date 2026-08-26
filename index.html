@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#07111f">
   <title>EventScope · 新闻事件智能分析平台</title>
   <link rel="icon" type="image/png" href="assets/eventscope-logo.png?v=20260826-brand-v2">
-  <link rel="stylesheet" href="dashboard.css?v=20260826-showcase-polish-v12">
-  <link rel="stylesheet" href="showcase-polish.css?v=20260826-showcase-polish-v12">
+  <link rel="stylesheet" href="dashboard.css?v=20260826-showcase-polish-v13">
+  <link rel="stylesheet" href="showcase-polish.css?v=20260826-showcase-polish-v13">
 </head>
 <body>
   <div class="noise"></div>
@@ -42,8 +42,8 @@
     </section>
 
     <section class="workspace-view" id="view-routing" data-title="事件匹配结果" data-subtitle="" data-number="02">
-      <div class="view-heading"><div><span class="step-kicker">第 2 步</span><h1>新闻与事件类型匹配</h1><p>系统逐条判断新闻属于哪一种事件类型。匹配成功的新闻进入关键信息提取；没有形成明确事件的内容会保留具体原因。本页展示匹配结果。</p></div><div class="heading-metrics"><span><b data-metric="route_rows">—</b> 新闻处理结果</span><span><b data-metric="filtered_articles">—</b> 未形成有效事件</span></div></div>
-      <div class="section-toolbar"><label><span>⌕</span><input data-search="routing" placeholder="搜索新闻标题、媒体、事件类型或新闻编号"></label><select data-filter="routing"><option value="all">全部匹配结果</option><option value="matched">匹配成功</option><option value="trash">未形成事件</option></select><button data-run="routing">搜索</button></div>
+      <div class="view-heading"><div><span class="step-kicker">第 2 步</span><h1>新闻与事件类型匹配</h1><p>系统逐条判断新闻属于哪一种事件类型。匹配成功的新闻进入关键信息提取；没有形成明确事件的内容会保留具体原因。本页展示匹配结果。</p></div><div class="heading-metrics"><span><b data-metric="route_rows">—</b> 条新闻处理结果</span><span><b data-metric="matched_routes">—</b> 条新闻匹配成功</span></div></div>
+      <div class="section-toolbar"><label><span>⌕</span><input data-search="routing" placeholder="搜索新闻标题、媒体或事件类型"></label><select data-filter="routing"><option value="all">全部匹配结果</option><option value="matched">匹配成功</option><option value="trash">未形成事件</option></select><button data-run="routing">搜索</button></div>
       <div class="result-caption" id="routing-caption"></div><div class="result-grid" id="routing-results"></div><div class="pager" data-pager="routing"></div>
     </section>
 
@@ -93,6 +93,6 @@
   <dialog id="detail-dialog"><button class="dialog-close" aria-label="关闭">×</button><div id="detail-body"></div></dialog>
   <dialog id="article-detail-dialog"><button class="dialog-close" aria-label="关闭新闻详情">×</button><div id="article-detail-body"></div></dialog>
   <dialog id="guide-dialog"><button class="dialog-close" aria-label="关闭说明">×</button><div id="guide-body"></div></dialog>
-  <script src="static-api.js?v=20260826-showcase-polish-v12"></script><script src="dashboard.js?v=20260826-showcase-polish-v12"></script>
+  <script src="static-api.js?v=20260826-showcase-polish-v13"></script><script src="dashboard.js?v=20260826-showcase-polish-v13"></script>
 </body>
 </html>

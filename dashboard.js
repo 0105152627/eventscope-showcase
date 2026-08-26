@@ -250,8 +250,8 @@ async function loadRouting() {
     state.more = data.has_more;
     state.totalPages = data.total_pages || null;
     setCaption('routing', data, '新闻事件匹配');
-    $('#routing-results').innerHTML = data.items.map(item => `<article class="data-card routing-card" data-detail-kind="routes" data-api="upstream" data-id="${esc(item.input_row_id)}">
-      <div class="card-top routing-status">${chip(item.route_status)}</div><h3>${esc(clip(item.article_title, 170))}</h3><p>${esc(clip(item.content_preview, 180))}</p>
+    $('#routing-results').innerHTML = data.items.map(item => `<article class="data-card routing-card ${item.route_status === 'trash' ? 'routing-card-unmatched' : 'routing-card-matched'}" data-detail-kind="routes" data-api="upstream" data-id="${esc(item.input_row_id)}">
+      <div class="card-top routing-status"><span class="routing-verdict">${item.route_status === 'trash' ? '未形成明确事件' : '已匹配标准事件'}</span>${chip(item.route_status)}</div><h3>${esc(clip(item.article_title, 170))}</h3><p>${esc(clip(item.content_preview, 210))}</p>
       ${item.final_event_ids?.length ? `<div class="route-events">${item.routed_events.slice(0, 3).map(event => `<span>${esc(event.event_name)}</span>`).join('')}</div>` : `<div class="reason-box"><b>未形成事件的原因：</b>${esc(textLabel(item.trash_reason))}</div>`}
       <div class="meta-line"><span>${esc(item.article_source)}</span><span>${esc(item.article_publish_time)}</span></div></article>`).join('') || empty();
     renderPager('routing'); bindDetailCards();
@@ -404,10 +404,12 @@ function renderRouteDetail(record) {
       exclusion_criteria: card.exclusion_criteria?.length ? card.exclusion_criteria : node.exclusion_criteria,
     }, name);
     const parentPath = card.parent_path || [];
-    const pathHtml = parentPath.length ? `<div class="parent-path">${parentPath.map(parent => `<span><small>${parent.level == null ? '上级' : `L${parent.level}`}</small>${esc(parent.event_name)}</span>`).join('<i>→</i>')}<i>→</i><span class="current"><small>${level == null ? '事件卡' : `L${level}`}</small>${esc(name)}</span></div>` : '';
-    return `<article class="routed-card-detail"><div class="clean-id"><span>分类卡编号</span><code>${esc(card.event_id)}</code></div>${pathHtml}<h3>${esc(name)}</h3><p>${esc(definition)}</p><div class="routed-boundaries">${routedBoundary('include', '收录条件', criteria.inclusion)}${routedBoundary('exclude', '排除条件', criteria.exclusion)}</div></article>`;
-  }).join('') : `<div class="route-empty-detail"><b>这条新闻没有匹配到明确事件类型</b><p>${esc(textLabel(record.trash_reason))}</p></div>`;
-  return detailFrame('新闻事件匹配详情', article.article_title || record.input_row_id, `<div class="clean-id"><span>新闻编号</span><code>${esc(record.input_row_id)}</code></div><div class="detail-two-column"><section class="article-paper"><header><span>${icon('article')}</span><b>新闻原文</b></header><p>${esc(article.content || '正文为空')}</p></section><section class="routed-stack"><header class="section-label"><span>${icon('route')}</span><b>匹配到的事件类型</b></header>${cardHtml}</section></div>`, 'route-detail');
+    const pathParts = [...parentPath, {level, event_name:name}];
+    const pathHtml = `<div class="parent-path">${pathParts.map((parent, index) => `<span class="${index === pathParts.length - 1 ? 'current' : ''}"><small>${parent.level == null ? '事件类型' : `L${parent.level}`}</small>${esc(parent.event_name)}</span>`).join('<i>→</i>')}</div>`;
+    return `<article class="routed-card-detail">${pathHtml}<div class="route-definition"><span>事件定义</span><p>${esc(definition)}</p></div><div class="routed-boundaries">${routedBoundary('include', '收录条件', criteria.inclusion)}${routedBoundary('exclude', '排除条件', criteria.exclusion)}</div></article>`;
+  }).join('') : `<div class="route-empty-detail"><span class="route-empty-symbol">×</span><div><small>匹配结论</small><b>这条新闻没有匹配到明确事件类型</b><p><span>具体原因</span>${esc(textLabel(record.trash_reason))}</p></div></div>`;
+  const resultLabel = cards.length ? '匹配到的事件类型' : '匹配判断结果';
+  return detailFrame('新闻事件匹配详情', article.article_title || '新闻匹配详情', `<div class="detail-two-column"><section class="article-paper route-article-paper"><header><span>${icon('article')}</span><div><b>新闻原文</b><small>用于核对事件匹配判断</small></div></header><p>${esc(article.content || '正文为空')}</p></section><section class="routed-stack"><header class="section-label"><span>${icon('route')}</span><b>${resultLabel}</b></header>${cardHtml}</section></div>`, 'route-detail');
 }
 function renderMentionDetail(record) {
   const article = record.article || {};
