@@ -55,7 +55,7 @@ let mediaRecordParent = null;
 const sectionGuides = {
   taxonomy: {number:'01', title:'标准事件体系', summary:'展示最终的事件分类卡，明确事件定义、收录条件与排除条件，作为后续流程的统一标准。', process:['从新闻语料中归纳可复用的事件类型。','合并含义相近的类型，整理为公司级与产业级三级分类。','最终确定事件名称、定义、收录条件和排除条件，作为全流程标准。'], points:['按公司级、产业级和三级结构浏览事件分类卡。','每张卡明确说明“收什么”和“不收什么”。','点击任意分类卡可查看完整定义与判断边界。']},
   routing: {number:'02', title:'事件匹配结果', summary:'系统逐条判断新闻属于哪一种事件类型，本页展示匹配成功和未形成明确事件的结果。', process:['先匹配一级事件领域，缩小候选范围。','再依次匹配二级、三级事件类型，核对新闻事实是否符合定义。','匹配成功进入信息提取；未形成事件的内容保留具体原因。'], points:['“匹配成功”表示新闻已找到对应事件类型。','“未形成事件”会显示体系外、证据不足或内容无效等原因。','点击记录可同时核对原文、事件定义、收录条件和排除条件。']},
-  mentions: {number:'03', title:'关键信息提取', summary:'从长篇新闻中抽取主体、事件事实和发生时间等关键信息，本页展示抽取结果。', process:['从匹配成功的新闻中提取主体、事件事实和发生时间。','判断影响方向与事实状态，并保留判断理由。','通过复核的结果进入去重、合并和可信度评估。'], points:['事件事实是对原文核心内容的简洁表达。','主体、事件类型、影响方向和事实状态以统一字段展示。','点击卡片可查看新闻编号、核心事实和评分依据。']},
+  mentions: {number:'03', title:'关键信息提取', summary:'从长篇新闻中抽取主体、事件事实和发生时间等关键信息，本页展示抽取结果。', process:['从匹配成功的新闻中提取主体、事件事实和发生时间。','判断影响方向与事实状态，并保留判断理由。','通过复核的结果进入去重、合并和可信度评估。'], points:['事件事实是对原文核心内容的简洁表达。','主体、事件类型、影响方向和事实状态以统一字段展示。','点击卡片可查看核心事实和评分依据。']},
   quality: {number:'04', title:'无效新闻过滤', summary:'过滤广告、残缺文本、抓取失败和没有明确事实的新闻，本页展示过滤结果及具体原因。', process:['检查正文完整性、内容有效性和证据充分性。','命中过滤条件的内容单独记录，不再进入事件库。','保留新闻原文与具体原因，方便人工回溯。'], points:['卡片直接展示过滤原因、来源媒体和正文摘要。','过滤结果不会参与后续事件合并与可信度计算。','点击记录可核对完整原文和每一项过滤依据。']},
   dedup: {number:'05', title:'重复事件合并', summary:'识别新闻转载链与同一事件的不同报道，本页面分别展示新闻转载链和事件合并结果。', process:['识别正文完全相同的转载，形成传播顺序。','比较主体、事实、时间和语义，判断不同报道是否指向同一事件。','将相同事件合并，同时保留全部来源证据。'], points:['“同文转载”展示相同正文如何在媒体间传播。','“事件合并”展示不同写法如何归并为同一事实。','点击卡片可逐篇查看合并前新闻与最终事件。']},
   library: {number:'06', title:'最终统一事件', summary:'展示原始新闻经过事件匹配、关键信息提取、过滤与去重后形成的完整事件库。', process:['有效结果经过重复识别和语义合并，形成最终事件。','根据独立媒体、原始资料和后续确认计算可信度。','汇总事件事实、影响方向、来源证据和解释信息。'], points:['每张卡展示可信度、来源规模和后续确认次数。','点击后可从最终结论追溯到每篇原始新闻。','可信度和影响方向均给出清晰的判断依据。']},
@@ -141,7 +141,7 @@ function eventCard(item, kind = 'instances') {
     <div class="meta-line merge-stats"><span>${fmt(item.publisher_count)} 家媒体</span><span>${fmt(item.article_count)} 篇报道</span><span>点击查看合并详情 →</span></div>
   </article>`;
   return `<article class="data-card event-card" data-detail-kind="${kind}" data-id="${esc(item.event_instance_id)}">
-    <div class="card-top"><code>${esc(item.event_instance_id)}</code>${chip(item.credibility_level || item.credibility_state)}</div>
+    <div class="card-top invalid-card-status">${chip(item.credibility_level || item.credibility_state)}</div>
     <h3>${esc(clip(item.canonical_fact, 210))}</h3>
     <div class="meta-line"><span>${esc(item.anchor_entity?.name || '主体待定')}</span><span>${esc(item.primary_event_name || item.root_domain)}</span><span>${esc(item.event_date || item.first_seen_at || '日期待定')}</span></div>
     ${scoreBar(item.credibility_score)}
@@ -151,7 +151,6 @@ function eventCard(item, kind = 'instances') {
 }
 function repostCard(item) {
   return `<article class="data-card repost-card" data-detail-kind="reposts" data-id="${esc(item.repost_group_id)}">
-    <div class="card-top"><code>${esc(item.repost_group_id)}</code></div>
     <h3>${esc(clip(item.title, 180))}</h3>
     <div class="meta-line repost-stats"><span>${fmt(item.article_count)} 篇完全同文</span><span>${fmt(item.media_count)} 家媒体</span><span>点击查看完整转载链 →</span></div>
   </article>`;
@@ -271,7 +270,7 @@ async function loadMentions() {
     $('#mentions-results').innerHTML = data.items.map(item => {
       const extraction = item.extraction || {};
       if (item.pair_valid !== true) return `<article class="data-card mention-card invalid-mention-card" data-detail-kind="mentions" data-api="upstream" data-id="${esc(item.mention_id)}"><div class="card-top invalid-card-status">${chip(String(item.pair_valid))}</div><h3>${esc(item.article_title || '新闻标题暂缺')}</h3><div class="reason-box"><b>无效原因</b><span>${esc(textLabel(item.invalid_reason || '未说明'))}</span></div><div class="meta-line"><span>${esc(item.article_source || '来源未知')}</span><span>${esc(item.publication_time || '时间未知')}</span><span>点击查看新闻原文</span></div></article>`;
-      return `<article class="data-card mention-card" data-detail-kind="mentions" data-api="upstream" data-id="${esc(item.mention_id)}"><div class="card-top"><code>${esc(item.mention_id)}</code>${chip(String(item.pair_valid))}</div><h3>${esc(extraction.event_fact || item.article_title || '未形成有效事件事实')}</h3><div class="field-grid"><div><small>锚定实体</small><b>${esc(extraction.anchor_entity?.name || extraction.anchor_entity || '—')}</b></div><div><small>事件类型</small><b>${esc(item.event_name || '—')}</b></div><div><small>影响方向</small><b>${esc(textLabel(extraction.impact_direction))}</b></div><div><small>事实状态</small><b>${esc(textLabel(extraction.assertion_status))}</b></div></div><div class="meta-line"><span>${esc(item.article_source)}</span><span>${esc(item.publication_time)}</span><span>点击查看提取详情</span></div></article>`;
+      return `<article class="data-card mention-card" data-detail-kind="mentions" data-api="upstream" data-id="${esc(item.mention_id)}"><div class="card-top invalid-card-status">${chip(String(item.pair_valid))}</div><h3>${esc(extraction.event_fact || item.article_title || '未形成有效事件事实')}</h3><div class="field-grid"><div><small>锚定实体</small><b>${esc(extraction.anchor_entity?.name || extraction.anchor_entity || '—')}</b></div><div><small>事件类型</small><b>${esc(item.event_name || '—')}</b></div><div><small>影响方向</small><b>${esc(textLabel(extraction.impact_direction))}</b></div><div><small>事实状态</small><b>${esc(textLabel(extraction.assertion_status))}</b></div></div><div class="meta-line"><span>${esc(item.article_source)}</span><span>${esc(item.publication_time)}</span><span>点击查看提取详情</span></div></article>`;
     }).join('') || empty();
     renderPager('mentions'); bindDetailCards();
   } catch (error) { $('#mentions-results').innerHTML = empty(error.message, true); }
@@ -284,7 +283,7 @@ async function loadQuality() {
     state.more = data.has_more;
     state.totalPages = data.total_pages || null;
     setCaption('quality', data, '无效新闻过滤结果');
-    $('#quality-results').innerHTML = data.items.map(item => `<article class="data-card quality-card" data-detail-kind="quality" data-id="${esc(item.input_row_id)}"><div class="card-top"><code>${esc(item.input_row_id)}</code>${chip('已过滤','bad')}</div><h3>${esc(item.title || '无标题内容')}</h3><p>${esc(clip(item.content_excerpt, 190) || '正文为空')}</p><div class="route-events">${(item.filter_reason_codes || []).map(reason => `<span>${esc(textLabel(reason))}</span>`).join('')}</div><div class="meta-line"><span>${esc(item.publisher)}</span><span>正文 ${fmt(item.normalized_content_length)} 字</span><span>点击查看过滤原因</span></div></article>`).join('') || empty();
+    $('#quality-results').innerHTML = data.items.map(item => `<article class="data-card quality-card" data-detail-kind="quality" data-id="${esc(item.input_row_id)}"><div class="card-top invalid-card-status">${chip('已过滤','bad')}</div><h3>${esc(item.title || '无标题内容')}</h3><p>${esc(clip(item.content_excerpt, 190) || '正文为空')}</p><div class="route-events">${(item.filter_reason_codes || []).map(reason => `<span>${esc(textLabel(reason))}</span>`).join('')}</div><div class="meta-line"><span>${esc(item.publisher)}</span><span>正文 ${fmt(item.normalized_content_length)} 字</span><span>点击查看过滤原因</span></div></article>`).join('') || empty();
     renderPager('quality'); bindDetailCards();
   } catch (error) { $('#quality-results').innerHTML = empty(error.message, true); }
 }
@@ -429,31 +428,31 @@ function renderRouteDetail(record) {
 }
 function renderMentionDetail(record) {
   const article = record.article || {};
-  if (record.pair_valid !== true) return detailFrame('无效实例详情', article.article_title || record.input_row_id, `<div class="clean-id"><span>原始新闻编号</span><code>${esc(record.input_row_id)}</code></div><section class="filter-reason-detail"><header><span>${icon('close')}</span><b>无效原因</b></header><div><i>${icon('close')}</i><span><b>${esc(textLabel(record.invalid_reason || '未说明'))}</b></span></div></section><section class="article-paper invalid-article"><header><span>${icon('article')}</span><b>原始新闻内容</b></header><p>${esc(article.content || '正文为空')}</p></section>`, 'invalid-mention-detail');
+  if (record.pair_valid !== true) return detailFrame('无效实例详情', article.article_title || '无标题新闻', `<section class="filter-reason-detail"><header><span>${icon('close')}</span><b>无效原因</b></header><div><i>${icon('close')}</i><span><b>${esc(textLabel(record.invalid_reason || '未说明'))}</b></span></div></section><section class="article-paper invalid-article"><header><span>${icon('article')}</span><b>原始新闻内容</b></header><p>${esc(article.content || '正文为空')}</p></section>`, 'invalid-mention-detail');
   const extraction = {
     event_fact: record.event_fact, impact_direction: record.impact_direction, impact_reason: record.impact_reason,
     ...(record.extraction || {})
   };
   const final = record.final_event_instance || {};
   const score = final.credibility_score;
-  return detailFrame('关键信息提取详情', article.article_title || record.input_row_id, `<div class="clean-id"><span>新闻编号</span><code>${esc(record.input_row_id)}</code></div><div class="mention-detail-grid"><section class="fact-spotlight"><span>核心事件事实</span><p>${esc(extraction.event_fact || '未提取到有效事件事实')}</p></section><section class="compact-score"><span>事件可信度评分</span><b>${score == null ? '待合并' : `${Math.round(score * 100)}分`}</b><small>${esc(textLabel(final.credibility_level || ''))}</small></section><section class="impact-panel"><span>影响方向与判断依据</span><b>${esc(textLabel(extraction.impact_direction))}</b><p>${esc(extraction.impact_reason || '未提供影响判断理由')}</p></section></div>${final.credibility_explanation?.length ? `<section class="plain-explanation"><header>${icon('score')} 可信度评分依据</header>${final.credibility_explanation.map(line => `<p>${esc(line)}</p>`).join('')}</section>` : ''}`, 'mention-detail');
+  return detailFrame('关键信息提取详情', article.article_title || '提取结果详情', `<div class="mention-detail-grid"><section class="fact-spotlight"><span>核心事件事实</span><p>${esc(extraction.event_fact || '未提取到有效事件事实')}</p></section><section class="compact-score"><span>事件可信度评分</span><b>${score == null ? '待合并' : `${Math.round(score * 100)}分`}</b><small>${esc(textLabel(final.credibility_level || ''))}</small></section><section class="impact-panel"><span>影响方向与判断依据</span><b>${esc(textLabel(extraction.impact_direction))}</b><p>${esc(extraction.impact_reason || '未提供影响判断理由')}</p></section></div>${final.credibility_explanation?.length ? `<section class="plain-explanation"><header>${icon('score')} 可信度评分依据</header>${final.credibility_explanation.map(line => `<p>${esc(line)}</p>`).join('')}</section>` : ''}`, 'mention-detail');
 }
 function renderQualityDetail(record) {
   const article = record.article || {};
   const reasons = record.filter_reason_codes || [];
-  return detailFrame('内容过滤详情', record.title || article.title || record.input_row_id, `<div class="clean-id"><span>新闻编号</span><code>${esc(record.input_row_id)}</code></div><section class="article-paper"><header><span>${icon('article')}</span><b>新闻正文</b></header><p>${esc(article.content || record.content_excerpt || '正文为空')}</p></section><section class="filter-reason-detail"><header><span>${icon('filter')}</span><b>过滤原因</b></header>${reasons.map(reason => `<div><i>${icon('close')}</i><span><b>${esc(textLabel(reason))}</b></span></div>`).join('')}</section>`, 'quality-detail');
+  return detailFrame('内容过滤详情', record.title || article.title || '无标题内容', `<section class="article-paper"><header><span>${icon('article')}</span><b>新闻正文</b></header><p>${esc(article.content || record.content_excerpt || '正文为空')}</p></section><section class="filter-reason-detail"><header><span>${icon('filter')}</span><b>过滤原因</b></header>${reasons.map(reason => `<div><i>${icon('close')}</i><span><b>${esc(textLabel(reason))}</b></span></div>`).join('')}</section>`, 'quality-detail');
 }
 function renderRepostDetail(record) {
   const timeline = record.timeline || [];
   const duplicateNote = Number(record.collapsed_duplicate_count || 0) ? `<span>已合并 ${fmt(record.collapsed_duplicate_count)} 条同媒体、同时间重复记录</span>` : '';
-  return detailFrame('转载链详情', timeline[0]?.title || record.repost_group_id, `<div class="repost-detail-layout"><section><header class="section-label"><span>${icon('repost')}</span><b>转载链（${fmt(timeline.length)}条）</b>${duplicateNote}</header><div class="full-propagation">${timeline.map((node, index) => `<button class="repost-news-item" data-article-reader="repost-article-reader" data-article-id="${esc(node.input_row_id)}"><i>${index + 1}</i><div><time>${esc(node.publish_time)}</time><b>${esc(node.media_normalized || node.media)}</b><code>${esc(node.input_row_id)}</code><p>${esc(node.title)}</p></div><span>${index === 0 ? '最早观测' : `+${Math.round(node.delay_from_first_minutes || 0)}分钟`}</span></button>`).join('')}</div></section><section class="source-reader repost-article-reader" id="repost-article-reader"><div class="reader-placeholder"><span>${icon('article')}</span><b>点击左侧新闻查看新闻 ID、标题和正文</b></div></section></div><p class="detail-footnote">转载顺序根据当前数据中的发布时间推断；最早观测不等同于法律意义上的原创证明。</p>`, 'repost-detail');
+  return detailFrame('转载链详情', timeline[0]?.title || '转载链详情', `<div class="repost-detail-layout"><section><header class="section-label"><span>${icon('repost')}</span><b>转载链（${fmt(timeline.length)}条）</b>${duplicateNote}</header><div class="full-propagation">${timeline.map((node, index) => `<button class="repost-news-item" data-article-reader="repost-article-reader" data-article-id="${esc(node.input_row_id)}"><i>${index + 1}</i><div><time>${esc(node.publish_time)}</time><b>${esc(node.media_normalized || node.media)}</b><p>${esc(node.title)}</p></div><span>${index === 0 ? '最早观测' : `+${Math.round(node.delay_from_first_minutes || 0)}分钟`}</span></button>`).join('')}</div></section><section class="source-reader repost-article-reader" id="repost-article-reader"><div class="reader-placeholder"><span>${icon('article')}</span><b>点击左侧新闻查看标题和正文</b></div></section></div><p class="detail-footnote">转载顺序根据当前数据中的发布时间推断；最早观测不等同于法律意义上的原创证明。</p>`, 'repost-detail');
 }
 function sourceBrowser(members, readerId) {
-  return `<div class="source-browser"><div class="source-list">${members.map((member, index) => `<button class="source-item ${index === 0 ? 'active' : ''}" data-article-reader="${readerId}" data-article-id="${esc(member.news_id)}"><span>${String(index + 1).padStart(2, '0')}</span><div><b>${esc(member.title || '标题暂缺')}</b><small>${esc(member.news_id)} · ${esc(member.publisher || '')}</small></div></button>`).join('')}</div><article class="source-reader" id="${readerId}"><div class="reader-placeholder"><span>${icon('article')}</span><b>点击左侧新闻查看正文</b></div></article></div>`;
+  return `<div class="source-browser"><div class="source-list">${members.map((member, index) => `<button class="source-item ${index === 0 ? 'active' : ''}" data-article-reader="${readerId}" data-article-id="${esc(member.news_id)}"><span>${String(index + 1).padStart(2, '0')}</span><div><b>${esc(member.title || '标题暂缺')}</b><small>${esc(member.publisher || '来源未知')}</small></div></button>`).join('')}</div><article class="source-reader" id="${readerId}"><div class="reader-placeholder"><span>${icon('article')}</span><b>点击左侧新闻查看正文</b></div></article></div>`;
 }
 function renderMergeDetail(record) {
   const members = record.members || [];
-  return detailFrame('重复事件合并详情', '多条新闻合并为一个统一事件', `<div class="merge-workbench"><section class="merge-sources"><header class="section-label"><span>${icon('article')}</span><b>合并前的新闻（${fmt(members.length)}条）</b></header>${sourceBrowser(members, 'merge-article-reader')}</section><div class="merge-arrow"><i>${icon('arrow')}</i><span>语义合并</span></div><section class="merged-result"><header><span>${icon('merge')}</span><b>合并后的事件</b></header><div class="clean-id"><span>事件编号</span><code>${esc(record.event_instance_id)}</code></div><p>${esc(record.canonical_fact)}</p>${record.llm_merge_reason ? `<div class="llm-human-note"><b>为什么可以合并</b>${esc(record.llm_merge_reason)}</div>` : ''}</section></div>`, 'merge-detail');
+  return detailFrame('重复事件合并详情', '多条新闻合并为一个统一事件', `<div class="merge-workbench"><section class="merge-sources"><header class="section-label"><span>${icon('article')}</span><b>合并前的新闻（${fmt(members.length)}条）</b></header>${sourceBrowser(members, 'merge-article-reader')}</section><div class="merge-arrow"><i>${icon('arrow')}</i><span>语义合并</span></div><section class="merged-result"><header><span>${icon('merge')}</span><b>合并后的事件</b></header><p>${esc(record.canonical_fact)}</p>${record.llm_merge_reason ? `<div class="llm-human-note"><b>为什么可以合并</b>${esc(record.llm_merge_reason)}</div>` : ''}</section></div>`, 'merge-detail');
 }
 function impactText(record) {
   const directions = record.impact_directions || [];
@@ -470,20 +469,20 @@ function impactEvidence(record) {
 function renderInstanceDetail(record) {
   const members = record.members || [];
   const explanation = record.credibility_explanation || [];
-  return detailFrame('最终事件详情', record.canonical_fact || record.event_instance_id, `<div class="library-detail-grid"><section class="library-sources"><header class="section-label"><span>${icon('article')}</span><b>原始新闻证据（${fmt(members.length)}条）</b><small>点击左侧新闻查看全文</small></header>${sourceBrowser(members, 'library-article-reader')}</section><section class="event-verdict"><div class="clean-id"><span>事件编号</span><code>${esc(record.event_instance_id)}</code></div><div class="verdict-fact"><span>最终事件事实</span><p>${esc(record.canonical_fact)}</p></div><div class="verdict-metrics"><div><span>事件可信度评分</span><b>${Math.round(Number(record.credibility_score || 0) * 100)}分</b></div><div><span>影响方向</span><b>${esc(impactText(record))}</b></div></div>${impactEvidence(record)}<section class="plain-explanation"><header>${icon('score')} 可信度评分依据</header>${explanation.map(line => `<p>${esc(line)}</p>`).join('')}</section></section></div>`, 'library-detail');
+  return detailFrame('最终事件详情', record.canonical_fact || '最终事件详情', `<div class="library-detail-grid"><section class="library-sources"><header class="section-label"><span>${icon('article')}</span><b>原始新闻证据（${fmt(members.length)}条）</b><small>点击左侧新闻查看全文</small></header>${sourceBrowser(members, 'library-article-reader')}</section><section class="event-verdict"><div class="verdict-fact"><span>最终事件事实</span><p>${esc(record.canonical_fact)}</p></div><div class="verdict-metrics"><div><span>事件可信度评分</span><b>${Math.round(Number(record.credibility_score || 0) * 100)}分</b></div><div><span>影响方向</span><b>${esc(impactText(record))}</b></div></div>${impactEvidence(record)}<section class="plain-explanation"><header>${icon('score')} 可信度评分依据</header>${explanation.map(line => `<p>${esc(line)}</p>`).join('')}</section></section></div>`, 'library-detail');
 }
 function renderMediaDetail(record) {
   const history = record.history || [];
-  return detailFrame('媒体信誉变更', record.publisher_family, `<div class="media-detail-head"><div><span>当前信誉分</span><b>${Number(record.credibility_score || 0).toFixed(1)}</b><small>${esc(textLabel(record.credibility_level))}</small></div><div class="resolved-counts"><span class="rise"><b>${fmt(record.increases)}</b>次上升</span><span class="fall"><b>${fmt(record.decreases)}</b>次下降</span></div></div><section class="reputation-history"><header><span>${icon('media')}</span><b>信誉分变更记录</b><small>从近到远 · 点击任意记录查看详情</small></header>${history.map(item => {const delta = Number(item.score_delta || 0);return `<button class="history-item ${item.action}" data-media-record="${esc(JSON.stringify(item))}"><i>${item.action === 'increase' ? icon('up') : icon('down')}</i><div><time>${esc(item.observed_at || '时间未知')}</time><p>${esc(item.reason || textLabel(item.reason_code))}</p><small>${esc(item.domain || '全局')} · ${esc(item.news_id || '')}</small></div><div class="history-score"><b>${delta >= 0 ? '+' : ''}${delta.toFixed(3)}</b><small>${scoreTransition(item.score_before, item.score_after)}</small><em>查看详情 →</em></div></button>`;}).join('') || empty('暂无已经解决的升降分记录')}</section>`, 'media-detail');
+  return detailFrame('媒体信誉变更', record.publisher_family, `<div class="media-detail-head"><div><span>当前信誉分</span><b>${Number(record.credibility_score || 0).toFixed(1)}</b><small>${esc(textLabel(record.credibility_level))}</small></div><div class="resolved-counts"><span class="rise"><b>${fmt(record.increases)}</b>次上升</span><span class="fall"><b>${fmt(record.decreases)}</b>次下降</span></div></div><section class="reputation-history"><header><span>${icon('media')}</span><b>信誉分变更记录</b><small>从近到远 · 点击任意记录查看详情</small></header>${history.map(item => {const delta = Number(item.score_delta || 0);return `<button class="history-item ${item.action}" data-media-record="${esc(JSON.stringify(item))}"><i>${item.action === 'increase' ? icon('up') : icon('down')}</i><div><time>${esc(item.observed_at || '时间未知')}</time><p>${esc(item.reason || textLabel(item.reason_code))}</p><small>${esc(item.domain || '全局')}</small></div><div class="history-score"><b>${delta >= 0 ? '+' : ''}${delta.toFixed(3)}</b><small>${scoreTransition(item.score_before, item.score_after)}</small><em>查看详情 →</em></div></button>`;}).join('') || empty('暂无已经解决的升降分记录')}</section>`, 'media-detail');
 }
 function recordArticlePanel(article) {
   if (!article) return `<section class="article-paper"><header><span>${icon('article')}</span><b>触发本次评分的新闻</b></header><p>对应新闻暂不可读取。</p></section>`;
-  return `<section class="article-paper media-trigger-article"><header><span>${icon('article')}</span><div><b>触发本次评分的新闻</b><small>${esc(article.news_id || '')} · ${esc(article.publisher || '')} · ${esc(article.publish_time || '')}</small></div></header><h3>${esc(article.title || '无标题')}</h3><p>${esc(article.content || '正文为空')}</p></section>`;
+  return `<section class="article-paper media-trigger-article"><header><span>${icon('article')}</span><div><b>触发本次评分的新闻</b><small>${esc(article.publisher || '来源未知')} · ${esc(article.publish_time || '时间未知')}</small></div></header><h3>${esc(article.title || '无标题')}</h3><p>${esc(article.content || '正文为空')}</p></section>`;
 }
 function routeMatchContext(article) {
   const cards = article?.routed_event_cards || [];
   if (!cards.length) return '';
-  return `<section class="route-match-context"><header><span>${icon('route')}</span><div><b>初步匹配到的事件类型</b><small>新闻已找到候选类型，但后续复核未形成有效事件</small></div></header><div class="route-match-cards">${cards.map(card => `<article><code>${esc(card.event_id)}</code><b>${esc(card.event_name || '事件类型')}</b><small>${esc(card.source_path || '')}</small></article>`).join('')}</div></section>`;
+  return `<section class="route-match-context"><header><span>${icon('route')}</span><div><b>初步匹配到的事件类型</b><small>新闻已找到候选类型，但后续复核未形成有效事件</small></div></header><div class="route-match-cards">${cards.map(card => `<article><b>${esc(card.event_name || '事件类型')}</b><small>${esc(card.source_path || '')}</small></article>`).join('')}</div></section>`;
 }
 function verificationMembers(update, instance) {
   const members = instance?.members || [];
@@ -532,7 +531,7 @@ function renderChainDetail(record) {
 }
 
 function renderChainNewsDetail(article) {
-  return `<div class="detail-content chain-news-detail"><span class="eyebrow">事件链节点 · 原始新闻</span><h2>${esc(article.title || '无标题')}</h2><div class="chain-news-meta"><code>${esc(article.news_id || '新闻 ID 未知')}</code><span>${esc(article.publisher || '来源未知')}</span><span>${esc(article.publish_time || '时间未知')}</span></div><article class="chain-news-paper"><h3>新闻正文</h3><p>${esc(article.content || '正文为空')}</p></article></div>`;
+  return `<div class="detail-content chain-news-detail"><span class="eyebrow">事件链节点 · 原始新闻</span><h2>${esc(article.title || '无标题')}</h2><div class="chain-news-meta"><span>${esc(article.publisher || '来源未知')}</span><span>${esc(article.publish_time || '时间未知')}</span></div><article class="chain-news-paper"><h3>新闻正文</h3><p>${esc(article.content || '正文为空')}</p></article></div>`;
 }
 
 async function openChainNewsDetail(newsId) {
@@ -567,7 +566,7 @@ async function bindArticleReaders(container, openFirst = true) {
     if (event?.isTrusted) reader.scrollIntoView({behavior:'smooth', block:'start'});
     try {
       const article = await getJson(`/api/article?id=${encodeURIComponent(button.dataset.articleId)}`);
-      reader.innerHTML = `<header><span>${icon('article')}</span><div><b>${esc(article.title || '无标题')}</b><small>${esc(article.news_id)} · ${esc(article.publisher || '')} · ${esc(article.publish_time || '')}</small></div></header><p>${esc(article.content || '正文为空')}</p>`;
+      reader.innerHTML = `<header><span>${icon('article')}</span><div><b>${esc(article.title || '无标题')}</b><small>${esc(article.publisher || '来源未知')} · ${esc(article.publish_time || '时间未知')}</small></div></header><p>${esc(article.content || '正文为空')}</p>`;
     } catch (error) { reader.innerHTML = empty(error.message, true); }
   });
   const first = container.querySelector('[data-article-id]');

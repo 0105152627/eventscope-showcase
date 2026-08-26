@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#07111f">
   <title>EventScope · 新闻事件智能分析平台</title>
   <link rel="icon" type="image/png" href="assets/eventscope-logo.png?v=20260826-brand-v2">
-  <link rel="stylesheet" href="dashboard.css?v=20260826-showcase-polish-v15">
-  <link rel="stylesheet" href="showcase-polish.css?v=20260826-showcase-polish-v15">
+  <link rel="stylesheet" href="dashboard.css?v=20260826-showcase-polish-v16">
+  <link rel="stylesheet" href="showcase-polish.css?v=20260826-showcase-polish-v16">
 </head>
 <body>
   <div class="noise"></div>
@@ -49,14 +49,14 @@
 
     <section class="workspace-view" id="view-mentions" data-title="关键信息提取" data-subtitle="" data-number="03">
       <div class="view-heading"><div><span class="step-kicker">第 3 步</span><h1>从新闻中提取关键信息</h1><p>从长篇新闻中抽取关键信息：主体是谁、发生了什么、何时发生等，本页展示抽取结果。</p></div><div class="heading-metrics"><span><b data-metric="mention_rows">—</b> 信息提取结果</span><span><b data-metric="valid_mentions">—</b> 有效结构化事件</span></div></div>
-      <div class="section-toolbar"><label><span>⌕</span><input data-search="mentions" placeholder="搜索主体、事件事实、媒体或编号"></label><select data-filter="mentions"><option value="all">全部提取结果</option><option value="true">有效结果</option><option value="false">无效结果</option></select><button data-run="mentions">搜索</button></div>
+      <div class="section-toolbar"><label><span>⌕</span><input data-search="mentions" placeholder="搜索主体、事件事实或媒体"></label><select data-filter="mentions"><option value="all">全部提取结果</option><option value="true">有效结果</option><option value="false">无效结果</option></select><button data-run="mentions">搜索</button></div>
       <div class="result-caption" id="mentions-caption"></div><div class="result-grid" id="mentions-results"></div><div class="pager" data-pager="mentions"></div>
     </section>
 
     <section class="workspace-view" id="view-quality" data-title="无效新闻过滤" data-subtitle="" data-number="04">
       <div class="view-heading"><div><span class="step-kicker">第 4 步</span><h1>过滤无效或低质量新闻</h1><p>过滤广告、残缺文本、抓取失败和没有明确事实的新闻，避免噪声影响最终结果，并保留原文和具体原因。本页面展示过滤结果。</p></div><div class="heading-metrics"><span><b data-metric="filtered_articles">—</b> 条过滤记录</span></div></div>
       <div class="reason-strip" id="quality-reasons"></div>
-      <div class="section-toolbar"><label><span>⌕</span><input data-search="quality" placeholder="搜索标题、媒体、新闻编号或过滤原因"></label><select data-filter="quality"><option value="filtered">明确过滤内容</option><option value="all">全部排除记录</option></select><button data-run="quality">搜索</button></div>
+      <div class="section-toolbar"><label><span>⌕</span><input data-search="quality" placeholder="搜索标题、媒体或过滤原因"></label><select data-filter="quality"><option value="filtered">明确过滤内容</option><option value="all">全部排除记录</option></select><button data-run="quality">搜索</button></div>
       <div class="result-caption" id="quality-caption"></div><div class="result-grid" id="quality-results"></div><div class="pager" data-pager="quality"></div>
     </section>
 
@@ -69,7 +69,7 @@
 
     <section class="workspace-view" id="view-library" data-title="最终统一事件" data-subtitle="" data-number="06">
       <div class="view-heading"><div><span class="step-kicker">第 6 步</span><h1>最终统一事件</h1><p>本页面展示原始新闻经过事件匹配、关键信息提取、过滤与去重后的完整事件库。</p></div><div class="heading-metrics"><span><b data-metric="event_instances">—</b> 条最终事件</span><span><b data-metric="reporting_paths">—</b> 条多源证据路径</span></div></div>
-      <div class="section-toolbar"><label><span>⌕</span><input data-search="library" placeholder="搜索事件事实、主体、领域或事件编号"></label><select data-filter="library"><option value="all">全部可信等级</option><option value="high">高可信</option><option value="medium">中可信</option><option value="low">低可信</option></select><button data-run="library">搜索</button></div>
+      <div class="section-toolbar"><label><span>⌕</span><input data-search="library" placeholder="搜索事件事实、主体或领域"></label><select data-filter="library"><option value="all">全部可信等级</option><option value="high">高可信</option><option value="medium">中可信</option><option value="low">低可信</option></select><button data-run="library">搜索</button></div>
       <div class="result-caption" id="library-caption"></div><div class="result-grid event-library" id="library-results"></div><div class="pager" data-pager="library"></div>
     </section>
 
@@ -93,6 +93,6 @@
   <dialog id="detail-dialog"><button class="dialog-close" aria-label="关闭">×</button><div id="detail-body"></div></dialog>
   <dialog id="article-detail-dialog"><button class="dialog-close" aria-label="关闭新闻详情">×</button><div id="article-detail-body"></div></dialog>
   <dialog id="guide-dialog"><button class="dialog-close" aria-label="关闭说明">×</button><div id="guide-body"></div></dialog>
-  <script src="static-api.js?v=20260826-showcase-polish-v15"></script><script src="dashboard.js?v=20260826-showcase-polish-v15"></script>
+  <script src="static-api.js?v=20260826-showcase-polish-v16"></script><script src="dashboard.js?v=20260826-showcase-polish-v16"></script>
 </body>
 </html>
