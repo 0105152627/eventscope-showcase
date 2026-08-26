@@ -3,7 +3,7 @@
   'use strict';
   const nativeFetch = window.fetch.bind(window);
   const base = new URL('./', document.currentScript.src);
-  const dataVersion = '20260826-all-chains-reviewed-v2';
+  const dataVersion = '20260826-deduped-invalid-mentions-v1';
   const jsonCache = new Map();
   const bucketCache = new Map();
   const scanCache = new Map();
