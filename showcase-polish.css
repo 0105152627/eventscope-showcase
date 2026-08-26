@@ -46,7 +46,7 @@ button, input, select { letter-spacing: 0; }
 .identity { padding: 0 12px 24px; gap: 14px; }
 .identity b { font-size: 22px; letter-spacing: -.01em; }
 .identity small { margin-top: 5px; color: #8ca8b9; font-size: 11px; letter-spacing: .04em; }
-.identity-mark { width: 42px; height: 42px; border-radius: 13px; }
+.identity-mark { width: 48px; height: 48px; border-radius: 14px; flex: 0 0 48px; }
 
 @media (min-width: 781px) {
   .module-nav { margin: 8px 0 0; gap: 7px; justify-content: flex-start; }
