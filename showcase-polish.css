@@ -273,11 +273,11 @@ button, input, select { letter-spacing: 0; }
 .reason-strip b, .annotation-strip b { font-size: 14px; }
 
 .chain-card { padding: 24px; border-radius: 20px; transition: .22s; }
-.chain-topic small { font-family: inherit; color: #7e9baa; font-size: 10px; }
-.chain-topic > b { color: #edf5f8; font-size: 17px; line-height: 1.45; }
+.chain-topic small { font-family: inherit; color: #91aebb; font-size: 13px; }
+.chain-head > div:first-child .chain-topic > b { color: #edf5f8; font-size: 19px; line-height: 1.45; }
 .chain-primary-event { font-size: 10px; }
 .story-node { min-width: 250px; max-width: 300px; padding-right: 20px; }
-.story-node time { color: #86a7b7; font-size: 11px; }
+.story-node time { color: #9ab4c1; font-size: 14px; }
 .story-node p { color: #c1d1d9; font-size: 13px; line-height: 1.7; }
 .node-tags span { padding: 5px 7px; font-size: 9px; }
 
@@ -454,7 +454,7 @@ dialog::backdrop { background: rgba(0, 8, 15, .78); }
   .chain-card { padding: 19px; }
   .chain-head { align-items: flex-start; flex-direction: column; gap: 12px; }
   .chain-head > div:last-child { align-self: flex-start; }
-  .chain-topic > b { font-size: 15px; }
+  .chain-head > div:first-child .chain-topic > b { font-size: 17px; }
   .story-node { min-width: 230px; max-width: 260px; }
   .story-node p { font-size: 12px; }
   .annotation-strip { padding-bottom: 9px; }

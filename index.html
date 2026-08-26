@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#07111f">
   <title>EventScope · 新闻事件智能分析平台</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%230b2033'/%3E%3Cg fill='none' stroke='%235de2da' stroke-width='3'%3E%3Cpath d='M18 33 42 19M18 33l25 14'/%3E%3C/g%3E%3Cg fill='%235de2da'%3E%3Ccircle cx='17' cy='33' r='5'/%3E%3Ccircle cx='43' cy='18' r='5'/%3E%3Ccircle cx='44' cy='47' r='5'/%3E%3C/g%3E%3C/svg%3E">
-  <link rel="stylesheet" href="dashboard.css?v=20260826-showcase-polish-v7">
-  <link rel="stylesheet" href="showcase-polish.css?v=20260826-showcase-polish-v7">
+  <link rel="stylesheet" href="dashboard.css?v=20260826-showcase-polish-v8">
+  <link rel="stylesheet" href="showcase-polish.css?v=20260826-showcase-polish-v8">
 </head>
 <body>
   <div class="noise"></div>
@@ -81,9 +81,9 @@
     </section>
 
     <section class="workspace-view" id="view-chains" data-title="事件发展脉络" data-subtitle="" data-number="08">
-      <div class="view-heading"><div><span class="step-kicker">第 8 步</span><h1>事件发展脉络</h1><p>相关事件会被系统识别整合为清晰的发展脉络，本页面展示各个事件链及关键节点标签。</p></div><div class="heading-metrics"><span><b data-metric="event_chains">—</b> 条事件链</span><span><b data-metric="alerts">—</b> 个风险节点</span></div></div>
+      <div class="view-heading"><div><span class="step-kicker">第 8 步</span><h1>事件发展脉络</h1><p>相关事件会被系统识别整合为清晰的发展脉络，本页面展示各个事件链及关键节点标签。</p></div><div class="heading-metrics"><span><b data-metric="event_chains">—</b> 条事件链</span><span><b data-metric="alerts">—</b> 个事件节点</span></div></div>
       <div class="annotation-strip" id="chain-annotations"></div>
-      <div class="section-toolbar"><label><span>⌕</span><input data-search="chains" placeholder="搜索公司、主题或节点内容"></label><select data-filter="chains"><option value="all">全部事件链</option><option value="confirmed">脉络完整</option><option value="developing">持续发展</option><option value="reassessing">需要重新判断</option></select><button data-run="chains">搜索</button></div>
+      <div class="section-toolbar"><label><span>⌕</span><input data-search="chains" placeholder="搜索公司、主题或节点内容"></label><button data-run="chains">搜索</button></div>
       <div class="result-caption" id="chains-caption"></div><div class="chain-list" id="chains-results"></div><div class="pager" data-pager="chains"></div>
     </section>
 
@@ -93,6 +93,6 @@
   <dialog id="detail-dialog"><button class="dialog-close" aria-label="关闭">×</button><div id="detail-body"></div></dialog>
   <dialog id="article-detail-dialog"><button class="dialog-close" aria-label="关闭新闻详情">×</button><div id="article-detail-body"></div></dialog>
   <dialog id="guide-dialog"><button class="dialog-close" aria-label="关闭说明">×</button><div id="guide-body"></div></dialog>
-  <script src="static-api.js?v=20260826-showcase-polish-v7"></script><script src="dashboard.js?v=20260826-showcase-polish-v7"></script>
+  <script src="static-api.js?v=20260826-showcase-polish-v8"></script><script src="dashboard.js?v=20260826-showcase-polish-v8"></script>
 </body>
 </html>
