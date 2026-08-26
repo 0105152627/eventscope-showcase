@@ -23,10 +23,11 @@ const labels = {
   high:'高可信', medium:'中可信', low:'低可信', watch:'观察', insufficient_sample:'样本不足',
   confirmed:'已确认', corroborated:'多源印证', reported:'已报道', unverified:'待核验',
   positive:'正面影响', negative:'负面影响', neutral:'影响中性', uncertain:'影响尚不明确',
-  fact:'事实陈述', rumor:'传闻信息', denial:'否认或澄清',
+  fact:'事实陈述', plan:'计划', forecast:'预测', prediction:'预测', opinion:'观点', rumor:'传闻信息', denial:'否认或澄清', missing:'未标注',
+  mixed:'混合影响', increase:'上升', decrease:'下降',
   developing:'持续发展', reassessing:'需要重新判断', resolved:'已有结果',
   INVALID_CONTENT:'无效内容', NO_SCHEMA_MATCH:'未被当前事件体系覆盖', NO_EVENT:'没有形成可提取事件', INSUFFICIENT_EVIDENCE:'证据不足',
-  EVENT_CARD_MISMATCH:'事件卡不匹配',
+  EVENT_CARD_MISMATCH:'事件卡不匹配', NO_DISTINCT_EVENT:'未形成独立事件',
   advertising_or_promotion_only:'广告或纯推广', content_shorter_than_repost_minimum:'正文过短',
   invalid_content_by_route_review:'匹配复核后判定无效', too_short_or_fragmentary_content:'正文残缺或只有来源署名',
   empty_content:'正文为空', fetch_or_page_failure:'页面抓取失败',
@@ -258,15 +259,18 @@ async function loadRouting() {
 }
 async function loadMentions() {
   const state = pageState.mentions;
+  const resultState = $('[data-filter="mentions"]').value;
+  const invalidOnly = resultState === 'false';
   showLoading('#mentions-results');
   try {
-    const data = await upstreamQuery('mentions', {page:state.page, q:$('[data-search="mentions"]').value.trim(), state:$('[data-filter="mentions"]').value});
+    const data = await upstreamQuery('mentions', {page:state.page, size:invalidOnly ? 6 : 12, q:$('[data-search="mentions"]').value.trim(), state:resultState});
     state.more = data.has_more;
     state.totalPages = data.total_pages || null;
     setCaption('mentions', data, '关键信息提取结果');
+    $('#mentions-results').classList.toggle('invalid-results-grid', invalidOnly);
     $('#mentions-results').innerHTML = data.items.map(item => {
       const extraction = item.extraction || {};
-      if (item.pair_valid !== true) return `<article class="data-card mention-card invalid-mention-card" data-detail-kind="mentions" data-api="upstream" data-id="${esc(item.mention_id)}"><div class="card-top"><code>${esc(item.mention_id)}</code>${chip(String(item.pair_valid))}</div><div class="reason-box"><b>无效原因：</b>${esc(textLabel(item.invalid_reason || '未说明'))}</div></article>`;
+      if (item.pair_valid !== true) return `<article class="data-card mention-card invalid-mention-card" data-detail-kind="mentions" data-api="upstream" data-id="${esc(item.mention_id)}"><div class="card-top"><span class="invalid-result-label">未形成有效事件</span>${chip(String(item.pair_valid))}</div><h3>${esc(item.article_title || '新闻标题暂缺')}</h3><div class="reason-box"><b>无效原因</b><span>${esc(textLabel(item.invalid_reason || '未说明'))}</span></div><div class="meta-line"><span>${esc(item.article_source || '来源未知')}</span><span>${esc(item.publication_time || '时间未知')}</span><span>点击查看新闻原文</span></div></article>`;
       return `<article class="data-card mention-card" data-detail-kind="mentions" data-api="upstream" data-id="${esc(item.mention_id)}"><div class="card-top"><code>${esc(item.mention_id)}</code>${chip(String(item.pair_valid))}</div><h3>${esc(extraction.event_fact || item.article_title || '未形成有效事件事实')}</h3><div class="field-grid"><div><small>锚定实体</small><b>${esc(extraction.anchor_entity?.name || extraction.anchor_entity || '—')}</b></div><div><small>事件类型</small><b>${esc(item.event_name || '—')}</b></div><div><small>影响方向</small><b>${esc(textLabel(extraction.impact_direction))}</b></div><div><small>事实状态</small><b>${esc(textLabel(extraction.assertion_status))}</b></div></div><div class="meta-line"><span>${esc(item.article_source)}</span><span>${esc(item.publication_time)}</span><span>点击查看提取详情</span></div></article>`;
     }).join('') || empty();
     renderPager('mentions'); bindDetailCards();
