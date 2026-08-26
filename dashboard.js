@@ -251,7 +251,7 @@ async function loadRouting() {
     state.totalPages = data.total_pages || null;
     setCaption('routing', data, '新闻事件匹配');
     $('#routing-results').innerHTML = data.items.map(item => `<article class="data-card routing-card ${item.route_status === 'trash' ? 'routing-card-unmatched' : 'routing-card-matched'}" data-detail-kind="routes" data-api="upstream" data-id="${esc(item.input_row_id)}">
-      <div class="card-top routing-status"><span class="routing-verdict">${item.route_status === 'trash' ? '未形成明确事件' : '已匹配标准事件'}</span>${chip(item.route_status)}</div><h3>${esc(clip(item.article_title, 170))}</h3><p>${esc(clip(item.content_preview, 210))}</p>
+      ${item.route_status === 'trash' ? '' : '<div class="card-top routing-status"><span class="routing-verdict">已匹配标准事件</span>' + chip(item.route_status) + '</div>'}<h3>${esc(clip(item.article_title, 170))}</h3><p>${esc(clip(item.content_preview, 210))}</p>
       ${item.final_event_ids?.length ? `<div class="route-events">${item.routed_events.slice(0, 3).map(event => `<span>${esc(event.event_name)}</span>`).join('')}</div>` : `<div class="reason-box"><b>未形成事件的原因：</b>${esc(textLabel(item.trash_reason))}</div>`}
       <div class="meta-line"><span>${esc(item.article_source)}</span><span>${esc(item.article_publish_time)}</span></div></article>`).join('') || empty();
     renderPager('routing'); bindDetailCards();
