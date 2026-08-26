@@ -87,23 +87,30 @@ button, input, select { letter-spacing: 0; }
 
 /* Every module begins with an explicit explanation for first-time judges. */
 .step-kicker {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 15px;
+  justify-content: center;
+  gap: 13px;
+  width: max-content;
+  max-width: 100%;
+  margin-bottom: 17px;
   color: var(--cyan);
-  font-size: 13px;
-  font-weight: 650;
-  letter-spacing: .03em;
+  font-size: 16px;
+  font-weight: 720;
+  letter-spacing: .06em;
+  white-space: nowrap;
 }
-.step-kicker::before {
+.step-kicker::before,
+.step-kicker::after {
   content: "";
-  width: 22px;
+  flex: 1 1 auto;
+  min-width: 18px;
   height: 2px;
   border-radius: 2px;
-  background: var(--cyan);
+  background: linear-gradient(90deg, rgba(88, 222, 214, .18), var(--cyan));
   box-shadow: 0 0 12px rgba(88, 222, 214, .35);
 }
+.step-kicker::after { background: linear-gradient(90deg, var(--cyan), rgba(88, 222, 214, .18)); }
 
 .view-heading {
   align-items: flex-end;
@@ -650,7 +657,7 @@ dialog::backdrop { background: rgba(0, 8, 15, .78); }
 
   .workspace-view { padding: 24px 15px 42px; }
   .view-heading { gap: 18px; padding: 4px 1px 22px; }
-  .step-kicker { margin-bottom: 12px; font-size: 11px; }
+  .step-kicker { gap: 9px; margin-bottom: 13px; font-size: 12px; }
   .view-heading h1 { font-size: 30px; line-height: 1.24; }
   .view-heading p:last-of-type, .view-hero p:last-of-type { margin-top: 13px; font-size: 13px; line-height: 1.75; }
   .judge-focus { margin-top: 13px; font-size: 11px; }

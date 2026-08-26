@@ -359,8 +359,24 @@ function activate(view) {
   $('#section-guide').setAttribute('aria-label', `${section.dataset.number} ${section.dataset.title}说明`);
   history.replaceState(null, '', `#${view}`);
   scrollTo({top:0, behavior:'smooth'});
+  alignStepKicker(section);
   loadView(view);
 }
+
+function alignStepKicker(section) {
+  requestAnimationFrame(() => {
+    const kicker = section?.querySelector('.step-kicker');
+    const title = section?.querySelector('.view-heading h1');
+    if (!kicker || !title) return;
+    const range = document.createRange();
+    range.selectNodeContents(title);
+    const lines = [...range.getClientRects()];
+    const titleWidth = Math.max(0, ...lines.map(line => line.width));
+    if (titleWidth) kicker.style.width = `${Math.ceil(titleWidth)}px`;
+  });
+}
+
+window.addEventListener('resize', () => alignStepKicker(document.querySelector('.workspace-view.active')));
 
 function detailFrame(kicker, title, body, extraClass = '') {
   return `<div class="detail-content ${extraClass}"><p class="eyebrow">${esc(kicker)}</p><h2>${esc(title)}</h2>${body}</div>`;
